@@ -1,0 +1,48 @@
+<div class="min-vh-100">
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <div class="col-lg-6 d-flex align-items-center justify-content-center p-4">
+                <div class="auth-form-wrapper w-100 bg-white p-5 rounded-4">
+                    <app-login-form [title]="'Welcome Back'" [isAdmin]="false"></app-login-form>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Don't have an account?
+                            <a routerLink="/signup" class="signup-link">Sign up</a>
+                        </p>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <a routerLink="/admin/login" class="admin-link">
+                            <i class="fas fa-shield-alt me-1"></i>
+                            Admin Login
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center auth-visual-side">
+                <div class="text-center text-white">
+                    <div class="auth-visual-content">
+                        <i class="fas fa-calendar-check auth-icon mb-4"></i>
+                        <h3 class="mb-3">The Ultimate Event Booking Experience</h3>
+                        <p class="mb-4">Join millions of users worldwide and discover amazing events near you.</p>
+                        <div class="stats-row">
+                            <div class="stat-item">
+                                <h4>5M+</h4>
+                                <p>Users</p>
+                            </div>
+                            <div class="stat-item">
+                                <h4>50K+</h4>
+                                <p>Events</p>
+                            </div>
+                            <div class="stat-item">
+                                <h4>100+</h4>
+                                <p>Cities</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

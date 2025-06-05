@@ -1,0 +1,53 @@
+{
+  "name": "node-templete-ts-2",
+  "description": "This a boilerplate for bootstrapping a node project in typescript",
+  "version": "1.0.0",
+  "private": true,
+  "author": "Sodiq Alabi",
+  "main": "server.js",
+  "scripts": {
+    "start": "ts-node-dev src/server.ts",
+    "build": "tsc",
+    "serve": "node dist/server.js",
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "run-ts-node": "ts-node-dev"
+  },
+  "engines": {
+    "node": "20.11.0",
+    "npm": "10.2.4"
+  },
+  "dependencies": {
+    "@airbrake/node": "^2.1.8",
+    "@types/jsonwebtoken": "^8.5.0",
+    "bcrypt": "^5.0.1",
+    "chalk": "^4.1.0",
+    "cors": "^2.8.5",
+    "date-fns": "^2.29.3",
+    "dotenv": "^8.2.0",
+    "errorhandler": "^1.5.1",
+    "express": "^4.18.3",
+    "helmet": "^4.2.0",
+    "ioredis": "^5.3.2",
+    "joi": "^17.3.0",
+    "json-stringify-safe": "^5.0.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.0.14",
+    "morgan": "^1.10.0",
+    "rate-limiter-flexible": "^2.4.2",
+    "swagger-ui-express": "^4.1.4",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/body-parser": "1.19.0",
+    "@types/cors": "^2.8.17",
+    "@types/errorhandler": "1.5.0",
+    "@types/morgan": "^1.9.3",
+    "@types/node": "^14.14.7",
+    "cross-env": "^7.0.2",
+    "nodemon": "^3.1.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3"
+  }
+}

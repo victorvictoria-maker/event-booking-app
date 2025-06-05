@@ -1,0 +1,5 @@
+node_modules
+.env
+.tscache 
+dist
+logs 

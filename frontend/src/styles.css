@@ -1,0 +1,37 @@
+/* You can add global styles to this file, and also import other style files */
+
+:root {
+  --bs-primary: #fd8041;
+  --bs-secondary: #242424;
+  --bs-gray: #878787;
+  --bs-light-gray: #f6f6f6;
+  --bs-white: #ffffff;
+  --bs-danger: #dc3545;
+  --bs-success: #28a745;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", sans-serif;
+}
+
+.textSecondary {
+  color: var(--bs-secondary);
+}
+
+.textGray {
+  color: var(--bs-gray);
+}
+
+.textLightGray {
+  color: var(--bs-light-gray);
+}
+
+.smallFont {
+  font-size: 0.9rem;
+}
+
+/* .mybutton {
+  background-color: var(--bs-primary);
+  color: var(--bs-white);
+} */

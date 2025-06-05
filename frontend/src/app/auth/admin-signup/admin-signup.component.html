@@ -1,0 +1,42 @@
+<div class="min-vh-100">
+    <div class="container-fluid">
+        <div class="row min-vh-100">
+            <div class="col-lg-6 d-flex align-items-center justify-content-center p-4">
+                <div class="auth-form-wrapper w-100 bg-white p-5 rounded-4">
+                    <app-signup-form [title]="'Admin Portal'" [isAdmin]="true"></app-signup-form>
+
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Already have an account?
+                            <a routerLink="/admin/login" class="signup-link">Login</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 d-none d-lg-flex align-items-center justify-content-center auth-visual-side">
+                <div class="text-center text-white">
+                    <div class="auth-visual-content">
+                        <i class="fas fa-calendar-check auth-icon mb-4"></i>
+                        <h3 class="mb-3">The Ultimate Event Booking Experience</h3>
+                        <p class="mb-4">Manage events, monitor user engagement, and ensure seamless operations across
+                            the platform.</p>
+                        <div class="stats-row">
+                            <div class="stat-item">
+                                <i class="fas fa-tools"></i>
+                                <span>Powerful Tools</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-user-shield "></i>
+                                <span>Full Control</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-chart-line "></i>
+                                <span>Real-Time Insights</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
