@@ -2,12 +2,12 @@ import { Component } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-user-dashboard',
   imports: [],
-  templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css',
+  templateUrl: './user-dashboard.component.html',
+  styleUrl: './user-dashboard.component.css',
 })
-export class DashboardComponent {
+export class UserDashboardComponent {
   constructor(private authService: AuthService) {}
 
   logOut() {

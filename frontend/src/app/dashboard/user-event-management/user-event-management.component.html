@@ -1,0 +1,73 @@
+<div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="textSecondary fw-bold mb-1">Available Events</h2>
+            <p class="textGray mb-0">Discover and book amazing events</p>
+        </div>
+        <div class="d-flex align-items-center">
+            <span class="badge bg-primary fs-6">{{ filteredEvents.length }} Events Available</span>
+        </div>
+    </div>
+
+    <!-- <div class="row mb-4">
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-0 bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title opacity-75 mb-1">Total Events</h6>
+                            <h3 class="mb-0">{{ filteredEvents.length }}</h3>
+                        </div>
+                        <i class="fas fa-calendar-alt fs-3 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-0 bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title opacity-75 mb-1">Events Available</h6>
+                            <h3 class="mb-0">{{ getAvailableEventsCount() }}</h3>
+                        </div>
+                        <i class="fas fa-ticket-alt fs-3 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-0 bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title opacity-75 mb-1">Free Events</h6>
+                            <h3 class="mb-0">{{ getFreeEventsCount() }}</h3>
+                        </div>
+                        <i class="fas fa-gift fs-3 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-3">
+            <div class="card border-0 bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title opacity-75 mb-1">Available Seats</h6>
+                            <h3 class="mb-0">{{ getTotalAvailableSeats() }}</h3>
+                        </div>
+                        <i class="fas fa-chair fs-3 opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+
+    <app-event-filters [filters]="filters" [categories]="categories" [showPriceFilter]="true" [showStatusFilter]="false"
+        (filtersChange)="onFiltersChange($event)" (clearFilters)="onClearFilters()"></app-event-filters>
+
+
+    <app-event-table [events]="filteredEvents" [mode]="'user'" [isLoading]="isLoading()"></app-event-table>
+</div>

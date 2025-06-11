@@ -1,0 +1,125 @@
+<div class="modal-header border-0">
+    <h4 class="modal-title textSecondary fw-bold">
+        {{ isEditMode ? 'Edit Event' : 'Create New Event' }}
+    </h4>
+    <button type="button" class="btn-close" (click)="dismiss()"></button>
+</div>
+
+<form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label textSecondary fw-semibold smallFont">Event Name *</label>
+                <input type="text" class="form-control" [class.is-invalid]="f['name'].invalid && f['name'].touched"
+                    formControlName="name" placeholder="Enter event name" />
+                <div class="invalid-feedback" *ngIf="f['name'].invalid && f['name'].touched">
+                    <span *ngIf="f['name'].errors?.['required']">Event name is required.</span>
+                    <span *ngIf="f['name'].errors?.['minlength']">Event name must be at least 3 characters.</span>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label textSecondary fw-semibold smallFont">Category *</label>
+                <select class="form-select" [class.is-invalid]="f['category'].invalid && f['category'].touched"
+                    formControlName="category">
+                    <option value="">Select category</option>
+                    <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+                </select>
+                <div class="invalid-feedback" *ngIf="f['category'].invalid && f['category'].touched">
+                    Category is required.
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label textSecondary fw-semibold smallFont">Description *</label>
+            <textarea class="form-control" rows="3"
+                [class.is-invalid]="f['description'].invalid && f['description'].touched" formControlName="description"
+                placeholder="Enter event description"></textarea>
+            <div class="invalid-feedback" *ngIf="f['description'].invalid && f['description'].touched">
+                <span *ngIf="f['description'].errors?.['required']">Description is required.</span>
+                <span *ngIf="f['description'].errors?.['minlength']">Description must be at least 10 characters.</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label textSecondary fw-semibold smallFont">Event Date *</label>
+                <input type="date" class="form-control" [class.is-invalid]="f['date'].invalid && f['date'].touched"
+                    formControlName="date" />
+                <div class="invalid-feedback" *ngIf="f['date'].invalid && f['date'].touched">
+                    Event date is required.
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label textSecondary fw-semibold smallFont">Event Time</label>
+                <input type="text" class="form-control" formControlName="time" placeholder="e.g., 10:00 - 17:00" />
+                <small class="text-muted">Format: HH:MM - HH:MM (optional)</small>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label class="form-label textSecondary fw-semibold smallFont">Total Seats *</label>
+                <input type="number" class="form-control"
+                    [class.is-invalid]="f['totalSeats'].invalid && f['totalSeats'].touched" formControlName="totalSeats"
+                    placeholder="Enter total seats" min="1" />
+                <div class="invalid-feedback" *ngIf="f['totalSeats'].invalid && f['totalSeats'].touched">
+                    <span *ngIf="f['totalSeats'].errors?.['required']">Total seats is required.</span>
+                    <span *ngIf="f['totalSeats'].errors?.['min']">Total seats must be at least 1.</span>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <label class="form-label textSecondary fw-semibold smallFont">Venue *</label>
+                <input type="text" class="form-control" [class.is-invalid]="f['venue'].invalid && f['venue'].touched"
+                    formControlName="venue" placeholder="Enter venue location" />
+                <div class="invalid-feedback" *ngIf="f['venue'].invalid && f['venue'].touched">
+                    Venue is required.
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="isFree" formControlName="isFree" />
+                <label class="form-check-label textSecondary fw-semibold" for="isFree">
+                    This is a free event
+                </label>
+            </div>
+
+            <div *ngIf="!f['isFree'].value" class="row">
+                <div class="col-md-6">
+                    <label class="form-label textSecondary fw-semibold smallFont">Event Price (₦) *</label>
+                    <input type="number" class="form-control"
+                        [class.is-invalid]="f['price'].invalid && f['price'].touched && !f['isFree'].value"
+                        formControlName="price" placeholder="Enter event price" min="0" />
+                    <div class="invalid-feedback"
+                        *ngIf="f['price'].invalid && f['price'].touched && !f['isFree'].value">
+                        <span *ngIf="f['price'].errors?.['min']">Price cannot be negative.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label textSecondary fw-semibold smallFont">Event Image</label>
+            <div class="border-2 border-dashed rounded p-4 text-center textGray">
+                <i class="fas fa-upload fs-2 mb-2"></i>
+                <p class="mb-0">Image upload coming soon</p>
+                <small>Feature will be available in future updates</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer border-0">
+        <button type="button" class="btn btn-outline-secondary" (click)="dismiss()">
+            Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="eventForm.invalid || isLoading">
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isLoading ? 'Saving...' : (isEditMode ? 'Update Event' : 'Create Event') }}
+        </button>
+    </div>
+</form>
