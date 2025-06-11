@@ -26,7 +26,6 @@ class AuthMidWare extends RootService {
     }
   };
   auth = async (req: Request, res: Response, next: NextFunction) => {
-    const actionType = "USER_AUTH_MIDWARE";
     try {
       await this._is_authenticated(req);
       next();
@@ -36,7 +35,6 @@ class AuthMidWare extends RootService {
         req,
         res,
         status,
-        actionType,
         message,
         data,
         error,
