@@ -8,12 +8,9 @@ const { SUCCESS, ERROR, CREATED, NOT_FOUND } = Status;
 class EventService extends RootService {
   getAllEvents = async (req: Request, res: Response) => {
     try {
-      const data = await EventController.fetchAllWithPagination(
-        {},
-        req.query,
-        "",
-        [{ path: "organizer", select: "username email" }]
-      );
+      const data = await EventController.getAllEvents({}, req.query, [
+        { path: "organizer", select: "username email" },
+      ]);
 
       this.sendResponse({
         req,
@@ -38,7 +35,7 @@ class EventService extends RootService {
   getEventById = async (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const data = await EventController.getById(id);
+      const data = await EventController.getEventById(id);
 
       this.sendResponse({
         req,
@@ -146,29 +143,57 @@ class EventService extends RootService {
     }
   };
 
-  // getEventsByCategory = async (req: Request, res: Response) => {
-  //   try {
-  //     const data = await EventController.getEventsByCategory();
+  toggleEventStatus = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const userId = (req as any).user.userId;
+      const isAdmin = (req as any).user.isAdmin || false;
 
-  //     this.sendResponse({
-  //       req,
-  //       res,
-  //       status: SUCCESS,
-  //       data,
-  //       message: "Events by category retrieved successfully",
-  //     });
-  //   } catch (error) {
-  //     const { status, message, data } = this.get_error(error);
-  //     this.sendResponse({
-  //       req,
-  //       res,
-  //       status: status || ERROR,
-  //       message: message || "Failed to retrieve events by category",
-  //       data,
-  //       error,
-  //     });
-  //   }
-  // };
+      const data = await EventController.toggleEventStatus(id, userId, isAdmin);
+
+      this.sendResponse({
+        req,
+        res,
+        status: SUCCESS,
+        data,
+        message: "Event status toggled successfully",
+      });
+    } catch (error) {
+      const { status, message, data } = this.get_error(error);
+      this.sendResponse({
+        req,
+        res,
+        status: status || ERROR,
+        message: message || "Failed to toggle event status",
+        data,
+        error,
+      });
+    }
+  };
+
+  getEventsByCategory = async (req: Request, res: Response) => {
+    try {
+      const data = await EventController.getEventsByCategory();
+
+      this.sendResponse({
+        req,
+        res,
+        status: SUCCESS,
+        data,
+        message: "Events by category gotten successfully",
+      });
+    } catch (error) {
+      const { status, message, data } = this.get_error(error);
+      this.sendResponse({
+        req,
+        res,
+        status: status || ERROR,
+        message: message || "Failed to get events by category",
+        data,
+        error,
+      });
+    }
+  };
 }
 
 export default new EventService();
