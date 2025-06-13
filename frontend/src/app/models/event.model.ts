@@ -37,3 +37,19 @@ export interface EventStats {
   totalBookings: number;
   availableSeats: number;
 }
+
+export interface CategoryStats {
+  count: number;
+  bookedSeats: number;
+  totalSeats: number;
+  events: any[];
+}
+
+export interface PaginationData {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}

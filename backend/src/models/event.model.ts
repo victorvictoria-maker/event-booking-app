@@ -4,7 +4,7 @@ export interface IEvent extends Document {
   name: string;
   description: string;
   category: string;
-  location: string;
+  // location: string;
   venue: string;
   date: Date;
   time: string;
@@ -56,11 +56,11 @@ const schema = new Schema<IEvent>(
         "other",
       ],
     },
-    location: {
-      type: String,
-      required: [true, "Event location is required"],
-      trim: true,
-    },
+    // location: {
+    //   type: String,
+    //   required: [true, "Event location is required"],
+    //   trim: true,
+    // },
     venue: {
       type: String,
       required: [true, "Event venue is required"],
@@ -142,13 +142,13 @@ schema.pre("save", function (this: IEvent) {
 });
 
 schema.index({ category: 1 });
-schema.index({ location: 1 });
+// schema.index({ location: 1 });
 schema.index({ date: 1 });
 schema.index({ status: 1 });
 schema.index({ organizer: 1 });
 schema.index({ availableSeats: 1 });
 schema.index({ status: 1, date: 1, category: 1 });
-schema.index({ name: "text", description: "text", location: "text" });
+schema.index({ name: "text", description: "text" });
 
 export interface IEventModel extends Model<IEvent> {}
 

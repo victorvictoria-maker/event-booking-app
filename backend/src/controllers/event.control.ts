@@ -41,7 +41,7 @@ class EventController extends RootController {
         searchCriteria.$or = [
           { name: { $regex: queryParams.search, $options: "i" } },
           { description: { $regex: queryParams.search, $options: "i" } },
-          { location: { $regex: queryParams.search, $options: "i" } },
+          // { location: { $regex: queryParams.search, $options: "i" } },
           { venue: { $regex: queryParams.search, $options: "i" } },
           { category: { $regex: queryParams.search, $options: "i" } },
         ];
@@ -234,7 +234,7 @@ class EventController extends RootController {
                 _id: "$_id",
                 name: "$name",
                 date: "$date",
-                location: "$location",
+                venue: "$venue",
                 price: "$price",
                 availableSeats: "$availableSeats",
               },

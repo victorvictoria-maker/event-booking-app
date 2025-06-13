@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { EventFilters } from '../../models/event.model';
+import categories from '../../data/eventCategories';
 
 @Component({
   selector: 'app-event-filters',
@@ -17,23 +18,7 @@ export class EventFiltersComponent {
     priceFilter: '',
   };
 
-  @Input() categories: string[] = [
-    'Workshop',
-    'Seminar',
-    'Concert',
-    'Festival',
-    'Sports',
-    'Exhibition',
-    'Networking',
-    'Webinar',
-    'Party',
-    'Charity',
-    'Business',
-    'Education',
-    'Entertainment',
-    'Other',
-  ];
-
+  @Input() categories: string[] = categories;
   @Input() statuses: string[] = ['active', 'cancelled', 'completed'];
   @Input() showPriceFilter: boolean = true;
   @Input() showStatusFilter: boolean = true;

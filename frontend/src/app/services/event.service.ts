@@ -70,7 +70,20 @@ export class EventService {
   }
 
   getEventStatsByCategory(): Observable<any> {
-    return this.http.get<any>(`${this.api}/event/stats/categories`);
+    return this.http.get<any>(`${this.api}/event/stats/categories`).pipe(
+      map((res: any) => {
+        if (res.status === 'SUCCESS') {
+          return {
+            status: 'SUCCESS',
+            data: res.data,
+            message: res.message || 'Event stats retrieved successfully',
+          };
+        } else {
+          throw new Error(res.message || 'Event stats not found');
+        }
+      }),
+      catchError(this.handleError)
+    );
   }
 
   getEventById(eventId: string): Observable<any> {
@@ -167,14 +180,6 @@ export class EventService {
   }
 
   deleteEvent(eventId: string): Observable<any> {
-    console.log(eventId);
-    console.log('Token:', this.auth.getToken());
-    console.log(this.getAuthHeaders());
-    // this.http
-    //   .post(`${this.api}/event/create`, data, {
-    //     headers: this.getAuthHeaders(),
-    //   })
-
     return this.http
       .delete(`${this.api}/event/${eventId}`, {
         headers: this.getAuthHeaders(),
@@ -222,30 +227,6 @@ export class EventService {
         }),
         catchError(this.handleError)
       );
-  }
-
-  getEventStats(): Observable<EventStats> {
-    return this.getAllEvents().pipe(
-      map((response) => {
-        const events = response.data?.events || [];
-        const stats: EventStats = {
-          totalEvents: events.length,
-          activeEvents: events.filter((e: Event) => e.status === 'active')
-            .length,
-          totalBookings: events.reduce(
-            (acc: number, e: Event) => acc + (e.bookedSeats || 0),
-            0
-          ),
-          availableSeats: events.reduce(
-            (acc: number, e: Event) =>
-              acc + ((e.totalSeats || 0) - (e.bookedSeats || 0)),
-            0
-          ),
-        };
-        return stats;
-      }),
-      catchError(this.handleError)
-    );
   }
 
   private handleError(error: HttpErrorResponse) {

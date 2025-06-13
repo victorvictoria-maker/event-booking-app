@@ -2,13 +2,19 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, signal } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventService } from '../../services/event.service';
-import { Event, EventFilters, EventStats } from '../../models/event.model';
+import {
+  CategoryStats,
+  Event,
+  EventFilters,
+  EventStats,
+  PaginationData,
+} from '../../models/event.model';
 import { EventModalComponent } from '../event-modal/event-modal.component';
 import { EventFiltersComponent } from '../event-filters/event-filters.component';
 import { EventTableComponent } from '../event-table/event-table.component';
 import { FormatNumber } from '../../utils/formatNumber';
 import { EventPaginationComponent } from '../event-pagination/event-pagination.component';
-import { CategoryStats, PaginationData } from '../../interfaces/eventInterface';
+import categories from '../../data/eventCategories';
 
 @Component({
   selector: 'app-admin-event-management',
@@ -50,22 +56,7 @@ export class AdminEventManagementComponent implements OnInit {
     priceFilter: '',
   };
 
-  categories = [
-    'Workshop',
-    'Seminar',
-    'Concert',
-    'Festival',
-    'Sports',
-    'Exhibition',
-    'Networking',
-    'Webinar',
-    'Party',
-    'Charity',
-    'Business',
-    'Education',
-    'Entertainment',
-    'Other',
-  ];
+  categories = categories;
 
   statuses = ['active', 'cancelled', 'completed'];
 
@@ -148,7 +139,7 @@ export class AdminEventManagementComponent implements OnInit {
     });
   }
 
-  private getActiveEventsCount() {
+  getActiveEventsCount() {
     const activeFilters: EventFilters = {
       searchTerm: '',
       category: '',

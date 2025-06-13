@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, signal } from '@angular/core';
 import { EventService } from '../../services/event.service';
-import { Event, EventFilters } from '../../models/event.model';
+import { Event, EventFilters, PaginationData } from '../../models/event.model';
 import { EventFiltersComponent } from '../event-filters/event-filters.component';
 import { EventTableComponent } from '../event-table/event-table.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventDetailsModalComponent } from '../event-details-modal/event-details-modal.component';
 import { EventPaginationComponent } from '../event-pagination/event-pagination.component';
-import { PaginationData } from '../../interfaces/eventInterface';
+import categories from '../../data/eventCategories';
 
 @Component({
   selector: 'app-user-event-management',
@@ -41,22 +41,7 @@ export class UserEventManagementComponent {
     priceFilter: '',
   };
 
-  categories = [
-    'Workshop',
-    'Seminar',
-    'Concert',
-    'Festival',
-    'Sports',
-    'Exhibition',
-    'Networking',
-    'Webinar',
-    'Party',
-    'Charity',
-    'Business',
-    'Education',
-    'Entertainment',
-    'Other',
-  ];
+  categories = categories;
 
   constructor(
     private eventService: EventService,
@@ -146,7 +131,7 @@ export class UserEventManagementComponent {
   }
 
   onBookEvent(event: Event) {
-    console.log('Booking event:', event);
+    alert('Booking event coming soon.');
   }
 
   getAvailableEventsCount(): number {

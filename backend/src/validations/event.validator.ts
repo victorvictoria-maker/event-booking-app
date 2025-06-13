@@ -31,7 +31,7 @@ class EventValidator {
         "entertainment",
         "other"
       ),
-    location: joi.string().required().min(3).max(200).trim(),
+    // location: joi.string().required().min(3).max(200).trim(),
     venue: joi.string().required().min(3).max(200).trim(),
     date: joi.date().required().min(tomorrow),
     time: joi.string().required().pattern(timeRangePattern).messages({
@@ -39,7 +39,7 @@ class EventValidator {
     }),
     totalSeats: joi.number().required().min(1).max(50000),
     price: joi.number().min(0).default(0),
-    eventPicture: joi.string().uri().optional(),
+    // eventPicture: joi.string().uri().optional(),
   });
 
   public updateEvent = joi.object({
@@ -65,7 +65,7 @@ class EventValidator {
         "other"
       )
       .optional(),
-    location: joi.string().min(3).max(200).trim().optional(),
+    // location: joi.string().min(3).max(200).trim().optional(),
     venue: joi.string().min(3).max(200).trim().optional(),
     date: joi.date().min(tomorrow).optional(),
     time: joi.string().pattern(timeRangePattern).optional().messages({
@@ -74,7 +74,7 @@ class EventValidator {
 
     totalSeats: joi.number().min(1).max(50000).optional(),
     price: joi.number().min(0).optional(),
-    eventPicture: joi.string().uri().optional(),
+    // eventPicture: joi.string().uri().optional(),
     status: joi.string().valid("active", "completed", "cancelled").optional(),
   });
 }

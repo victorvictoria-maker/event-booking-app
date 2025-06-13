@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { PaginationData } from '../../interfaces/eventInterface';
+import { PaginationData } from '../../models/event.model';
 
 @Component({
   selector: 'app-event-pagination',
@@ -24,14 +24,14 @@ export class EventPaginationComponent {
   @Output() previousPage = new EventEmitter<void>();
   @Output() nextPage = new EventEmitter<void>();
 
-  getFromEntry(): number {
+  getFromCount(): number {
     return (
       (this.paginationData.currentPage - 1) * this.paginationData.itemsPerPage +
       1
     );
   }
 
-  getToEntry(): number {
+  getToCount(): number {
     return Math.min(
       this.paginationData.currentPage * this.paginationData.itemsPerPage,
       this.paginationData.totalItems

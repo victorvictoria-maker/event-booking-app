@@ -10,6 +10,7 @@ import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Event } from '../../models/event.model';
 import { timeFormatValidator } from '../../utils/timeFormatValidator';
 import { futureDateValidator } from '../../utils/futureDateValidator';
+import categories from '../../data/eventCategories';
 
 @Component({
   selector: 'app-event-modal',
@@ -20,22 +21,7 @@ import { futureDateValidator } from '../../utils/futureDateValidator';
 export class EventModalComponent implements OnInit {
   @Input() event?: Event;
   @Input() isEditMode: boolean = false;
-  @Input() categories: string[] = [
-    'Workshop',
-    'Seminar',
-    'Concert',
-    'Festival',
-    'Sports',
-    'Exhibition',
-    'Networking',
-    'Webinar',
-    'Party',
-    'Charity',
-    'Business',
-    'Education',
-    'Entertainment',
-    'Other',
-  ];
+  @Input() categories: string[] = categories;
 
   @Output() eventSubmit = new EventEmitter<Event>();
   @Output() modalClose = new EventEmitter<void>();
