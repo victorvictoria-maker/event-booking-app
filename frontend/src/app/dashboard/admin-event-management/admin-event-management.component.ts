@@ -6,10 +6,19 @@ import { Event, EventFilters, EventStats } from '../../models/event.model';
 import { EventModalComponent } from '../event-modal/event-modal.component';
 import { EventFiltersComponent } from '../event-filters/event-filters.component';
 import { EventTableComponent } from '../event-table/event-table.component';
+import { FormatNumber } from '../../utils/formatNumber';
+import { EventPaginationComponent } from '../event-pagination/event-pagination.component';
+import { CategoryStats, PaginationData } from '../../interfaces/eventInterface';
 
 @Component({
   selector: 'app-admin-event-management',
-  imports: [CommonModule, EventFiltersComponent, EventTableComponent],
+  imports: [
+    CommonModule,
+    EventFiltersComponent,
+    EventTableComponent,
+    FormatNumber,
+    EventPaginationComponent,
+  ],
   templateUrl: './admin-event-management.component.html',
   styleUrl: './admin-event-management.component.css',
 })
@@ -17,6 +26,15 @@ export class AdminEventManagementComponent implements OnInit {
   events: Event[] = [];
   filteredEvents: Event[] = [];
   isLoading = signal(false);
+
+  paginationData: PaginationData = {
+    currentPage: 1,
+    totalPages: 0,
+    totalItems: 0,
+    itemsPerPage: 10,
+    hasNextPage: false,
+    hasPrevPage: false,
+  };
 
   eventStats: EventStats = {
     totalEvents: 0,
@@ -33,12 +51,19 @@ export class AdminEventManagementComponent implements OnInit {
   };
 
   categories = [
-    'Conference',
     'Workshop',
     'Seminar',
     'Concert',
-    'Exhibition',
+    'Festival',
     'Sports',
+    'Exhibition',
+    'Networking',
+    'Webinar',
+    'Party',
+    'Charity',
+    'Business',
+    'Education',
+    'Entertainment',
     'Other',
   ];
 
@@ -54,27 +79,68 @@ export class AdminEventManagementComponent implements OnInit {
     this.loadEventStats();
   }
 
-  loadEvents() {
+  loadEvents(page: number = 1) {
     this.isLoading.set(true);
-    this.eventService.getAllEvents(this.filters).subscribe({
-      next: (response) => {
-        this.events = response.data;
-        this.filteredEvents = [...this.events];
-        this.isLoading.set(false);
-        console.log('Events loaded:', response.message);
-      },
-      error: (error) => {
-        this.isLoading.set(false);
-        console.error('Failed to load events:', error.message);
-        alert('Failed to load events: ' + error.message);
-      },
-    });
+    this.paginationData.currentPage = page;
+
+    this.eventService
+      .getAllEvents(this.filters, page, this.paginationData.itemsPerPage)
+      .subscribe({
+        next: (response) => {
+          this.events = response.data?.events || [];
+          this.filteredEvents = [...this.events];
+
+          if (response.data?.pagination) {
+            this.paginationData = {
+              currentPage: response.data.pagination.currentPage,
+              totalPages: response.data.pagination.totalPages,
+              totalItems: response.data.pagination.totalItems,
+              itemsPerPage: response.data.pagination.itemsPerPage,
+              hasNextPage: response.data.pagination.hasNextPage,
+              hasPrevPage: response.data.pagination.hasPrevPage,
+            };
+
+            this.eventStats.totalEvents = this.paginationData.totalItems;
+          }
+
+          this.isLoading.set(false);
+        },
+
+        error: (error) => {
+          this.isLoading.set(false);
+          console.error('Failed to load events:', error.message);
+          alert('Failed to load events: ' + error.message);
+        },
+      });
   }
 
   loadEventStats() {
-    this.eventService.getEventStats().subscribe({
-      next: (stats) => {
-        this.eventStats = stats;
+    this.eventService.getEventStatsByCategory().subscribe({
+      next: (response) => {
+        if (response.data && Array.isArray(response.data)) {
+          const responseData: CategoryStats[] = response.data;
+
+          const totalBookings = responseData.reduce(
+            (sum: number, cat: CategoryStats) => sum + cat.bookedSeats,
+            0
+          );
+
+          const totalSeats = responseData.reduce(
+            (sum: number, cat: CategoryStats) => sum + cat.totalSeats,
+            0
+          );
+
+          const availableSeats = totalSeats - totalBookings;
+
+          this.eventStats = {
+            totalEvents: this.paginationData.totalItems,
+            activeEvents: 0,
+            totalBookings: totalBookings,
+            availableSeats: availableSeats,
+          };
+
+          this.getActiveEventsCount();
+        }
       },
       error: (error) => {
         console.error('Failed to load event stats:', error.message);
@@ -82,8 +148,29 @@ export class AdminEventManagementComponent implements OnInit {
     });
   }
 
+  private getActiveEventsCount() {
+    const activeFilters: EventFilters = {
+      searchTerm: '',
+      category: '',
+      status: 'active',
+      priceFilter: '',
+    };
+
+    this.eventService.getAllEvents(activeFilters, 1, 1).subscribe({
+      next: (response) => {
+        if (response.data?.pagination) {
+          this.eventStats.activeEvents = response.data.pagination.totalItems;
+        }
+      },
+      error: (error) => {
+        console.error('Failed to load active events count:', error.message);
+      },
+    });
+  }
+
   onFiltersChange(newFilters: EventFilters) {
     this.filters = { ...newFilters };
+    this.paginationData.currentPage = 1;
     this.loadEvents();
   }
 
@@ -94,7 +181,24 @@ export class AdminEventManagementComponent implements OnInit {
       status: '',
       priceFilter: '',
     };
+    this.paginationData.currentPage = 1;
     this.loadEvents();
+  }
+
+  onPageChange(page: number) {
+    this.loadEvents(page);
+  }
+
+  onPreviousPage() {
+    if (this.paginationData.hasPrevPage) {
+      this.loadEvents(this.paginationData.currentPage - 1);
+    }
+  }
+
+  onNextPage() {
+    if (this.paginationData.hasNextPage) {
+      this.loadEvents(this.paginationData.currentPage + 1);
+    }
   }
 
   openCreateEventModal() {

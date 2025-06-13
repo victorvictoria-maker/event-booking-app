@@ -8,6 +8,8 @@ import {
 } from '@angular/forms';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Event } from '../../models/event.model';
+import { timeFormatValidator } from '../../utils/timeFormatValidator';
+import { futureDateValidator } from '../../utils/futureDateValidator';
 
 @Component({
   selector: 'app-event-modal',
@@ -15,16 +17,23 @@ import { Event } from '../../models/event.model';
   templateUrl: './event-modal.component.html',
   styleUrl: './event-modal.component.css',
 })
-export class EventModalComponent {
+export class EventModalComponent implements OnInit {
   @Input() event?: Event;
   @Input() isEditMode: boolean = false;
   @Input() categories: string[] = [
-    'Conference',
     'Workshop',
     'Seminar',
     'Concert',
-    'Exhibition',
+    'Festival',
     'Sports',
+    'Exhibition',
+    'Networking',
+    'Webinar',
+    'Party',
+    'Charity',
+    'Business',
+    'Education',
+    'Entertainment',
     'Other',
   ];
 
@@ -33,33 +42,45 @@ export class EventModalComponent {
 
   eventForm: FormGroup;
   isLoading = false;
+  minDate: string;
 
   constructor(private fb: FormBuilder, public activeModal: NgbActiveModal) {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    this.minDate = tomorrow.toISOString().split('T')[0];
+
     this.eventForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
-      date: ['', Validators.required],
-      time: [''],
+      date: ['', [Validators.required, futureDateValidator]],
+      time: ['', [Validators.required, timeFormatValidator]],
       venue: ['', Validators.required],
       totalSeats: ['', [Validators.required, Validators.min(1)]],
       category: ['', Validators.required],
       isFree: [true],
-      price: [0, [Validators.min(0)]],
+      price: [0, [Validators.required, Validators.min(0)]],
     });
   }
 
   ngOnInit() {
     if (this.event && this.isEditMode) {
+      const eventDate = new Date(this.event.date);
+      const formattedDate = eventDate.toISOString().split('T')[0];
+
+      const matchingCategory = this.categories.find(
+        (cat) => cat.toLowerCase() === this.event?.category?.toLowerCase()
+      );
+
       this.eventForm.patchValue({
         name: this.event.name,
         description: this.event.description,
-        date: this.event.date,
-        time: this.event.time || '',
+        date: formattedDate,
+        time: this.event.time,
         venue: this.event.venue,
         totalSeats: this.event.totalSeats,
-        category: this.event.category,
+        category: matchingCategory,
         isFree: this.event.isFree,
-        price: this.event.price || 0,
+        price: this.event.price,
       });
     }
 
@@ -93,7 +114,7 @@ export class EventModalComponent {
 
       if (this.isEditMode && this.event) {
         const updateData: Event = {
-          id: this.event.id,
+          id: this.event._id,
           ...eventData,
         };
         this.eventSubmit.emit(updateData);

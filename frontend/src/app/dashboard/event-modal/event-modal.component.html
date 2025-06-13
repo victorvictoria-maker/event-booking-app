@@ -46,16 +46,25 @@
             <div class="col-md-6 mb-3">
                 <label class="form-label textSecondary fw-semibold smallFont">Event Date *</label>
                 <input type="date" class="form-control" [class.is-invalid]="f['date'].invalid && f['date'].touched"
-                    formControlName="date" />
+                    formControlName="date" [min]="minDate" />
                 <div class="invalid-feedback" *ngIf="f['date'].invalid && f['date'].touched">
-                    Event date is required.
+                    <span *ngIf="f['date'].errors?.['required']">Event date is required.</span>
+                    <span *ngIf="f['date'].errors?.['pastDate']">Event date must be tomorrow or later.</span>
                 </div>
+                <small class="text-muted">Events must be scheduled for tomorrow or later</small>
             </div>
 
+
             <div class="col-md-6 mb-3">
-                <label class="form-label textSecondary fw-semibold smallFont">Event Time</label>
-                <input type="text" class="form-control" formControlName="time" placeholder="e.g., 10:00 - 17:00" />
-                <small class="text-muted">Format: HH:MM - HH:MM (optional)</small>
+                <label class="form-label textSecondary fw-semibold smallFont">Event Time *</label>
+                <input type="text" class="form-control" [class.is-invalid]="f['time'].invalid && f['time'].touched"
+                    formControlName="time" placeholder="e.g., 10:00 - 17:00" />
+                <div class="invalid-feedback" *ngIf="f['time'].invalid && f['time'].touched">
+                    <span *ngIf="f['time'].errors?.['required']">Time is required.</span>
+                    <span *ngIf="f['time'].errors?.['invalidTimeFormat']">Use format: HH:MM - HH:MM (e.g., 10:00 -
+                        17:00)</span>
+                </div>
+                <small class="text-muted">Format: HH:MM - HH:MM</small>
             </div>
         </div>
 
@@ -74,7 +83,7 @@
             <div class="col-md-6 mb-3">
                 <label class="form-label textSecondary fw-semibold smallFont">Venue *</label>
                 <input type="text" class="form-control" [class.is-invalid]="f['venue'].invalid && f['venue'].touched"
-                    formControlName="venue" placeholder="Enter venue location" />
+                    formControlName="venue" placeholder="Enter venue" />
                 <div class="invalid-feedback" *ngIf="f['venue'].invalid && f['venue'].touched">
                     Venue is required.
                 </div>
@@ -97,6 +106,7 @@
                         formControlName="price" placeholder="Enter event price" min="0" />
                     <div class="invalid-feedback"
                         *ngIf="f['price'].invalid && f['price'].touched && !f['isFree'].value">
+                        <span *ngIf="f['price'].errors?.['required']">Price is required for paid events.</span>
                         <span *ngIf="f['price'].errors?.['min']">Price cannot be negative.</span>
                     </div>
                 </div>

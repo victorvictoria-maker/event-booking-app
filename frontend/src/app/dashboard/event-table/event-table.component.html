@@ -1,6 +1,6 @@
 <div class="card border-0">
     <div class="card-header bg-white border-bottom">
-        <h5 class="mb-0 textSecondary">All Events ({{ events.length }})</h5>
+        <h5 class="mb-0 textSecondary">All Events ({{ totalEvents }})</h5>
     </div>
     <div class="card-body p-0">
         <div *ngIf="isLoading" class="text-center py-5">
@@ -89,11 +89,11 @@
                                     title="Edit Event">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-warning" (click)="onToggleEventStatus(event.id)"
+                                <button class="btn btn-sm btn-outline-warning" (click)="onToggleEventStatus(event._id)"
                                     [title]="event.status === 'active' ? 'Cancel Event' : 'Activate Event'">
                                     <i [class]="event.status === 'active' ? 'fas fa-pause' : 'fas fa-play'"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" (click)="onDeleteEvent(event.id)"
+                                <button class="btn btn-sm btn-outline-danger" (click)="onDeleteEvent(event._id)"
                                     title="Delete Event">
                                     <i class="fas fa-trash"></i>
                                 </button>

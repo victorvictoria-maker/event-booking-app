@@ -20,8 +20,14 @@ export class LoginFormComponent implements OnInit {
     const token = localStorage.getItem('event-booking-app-token');
     const isAdmin = localStorage.getItem('event-booking-is-admin') === 'true';
 
+    const currentUrl = this.router.url;
+
     if (token) {
-      this.router.navigateByUrl(isAdmin ? '/admin/dashboard' : '/dashboard');
+      if (isAdmin && currentUrl === '/admin/login') {
+        this.router.navigateByUrl('/admin/dashboard');
+      } else if (!isAdmin && currentUrl === '/login') {
+        this.router.navigateByUrl('/dashboard');
+      }
     }
   }
 
@@ -76,9 +82,8 @@ export class LoginFormComponent implements OnInit {
         if (this.returnUrl) {
           this.router.navigateByUrl(this.returnUrl);
         } else {
-          this.router.navigateByUrl(
-            result.isAdmin ? 'admin/dashboard' : 'dashboard'
-          );
+          const isAdmin = result.isAdmin;
+          this.router.navigateByUrl(isAdmin ? 'admin/dashboard' : 'dashboard');
         }
       },
       error: (error) => {

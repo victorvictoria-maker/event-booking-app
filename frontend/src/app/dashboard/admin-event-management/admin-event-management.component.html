@@ -17,7 +17,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title opacity-75 mb-1">Total Events</h6>
-                            <h3 class="mb-0">{{ eventStats.totalEvents }}</h3>
+                            <h3 class="mb-0">{{ eventStats.totalEvents | numberFormat }}</h3>
                         </div>
                         <i class="fas fa-calendar-alt fs-3 opacity-75"></i>
                     </div>
@@ -30,7 +30,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title opacity-75 mb-1">Active Events</h6>
-                            <h3 class="mb-0">{{ eventStats.activeEvents }}</h3>
+                            <h3 class="mb-0">{{ eventStats.activeEvents | numberFormat }}</h3>
                         </div>
                         <i class="fas fa-play-circle fs-3 opacity-75"></i>
                     </div>
@@ -43,7 +43,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title opacity-75 mb-1">Total Bookings</h6>
-                            <h3 class="mb-0">{{ eventStats.totalBookings }}</h3>
+                            <h3 class="mb-0">{{ eventStats.totalBookings | numberFormat }}</h3>
                         </div>
                         <i class="fas fa-ticket-alt fs-3 opacity-75"></i>
                     </div>
@@ -56,7 +56,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title opacity-75 mb-1">Available Seats</h6>
-                            <h3 class="mb-0">{{ eventStats.availableSeats }}</h3>
+                            <h3 class="mb-0">{{ eventStats.availableSeats |numberFormat }}</h3>
                         </div>
                         <i class="fas fa-chair fs-3 opacity-75"></i>
                     </div>
@@ -71,5 +71,9 @@
 
     <app-event-table [events]="filteredEvents" [mode]="'admin'" [isLoading]="isLoading()"
         (editEvent)="openEditEventModal($event)" (deleteEvent)="deleteEvent($event)"
-        (toggleEventStatus)="toggleEventStatus($event)"></app-event-table>
+        (toggleEventStatus)="toggleEventStatus($event)" [totalEvents]="paginationData.totalItems"></app-event-table>
+
+    <app-event-pagination [paginationData]="paginationData" ariaLabel="Events pagination"
+        (pageChange)="onPageChange($event)" (previousPage)="onPreviousPage()" (nextPage)="onNextPage()">
+    </app-event-pagination>
 </div>

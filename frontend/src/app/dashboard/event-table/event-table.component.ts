@@ -14,6 +14,7 @@ export class EventTableComponent {
   @Input() events: Event[] = [];
   @Input() mode: EventTableMode = 'admin';
   @Input() isLoading: boolean = false;
+  @Input() totalEvents: number = 0;
 
   @Output() editEvent = new EventEmitter<Event>();
   @Output() deleteEvent = new EventEmitter<string>();

@@ -18,12 +18,19 @@ export class EventFiltersComponent {
   };
 
   @Input() categories: string[] = [
-    'Conference',
     'Workshop',
     'Seminar',
     'Concert',
-    'Exhibition',
+    'Festival',
     'Sports',
+    'Exhibition',
+    'Networking',
+    'Webinar',
+    'Party',
+    'Charity',
+    'Business',
+    'Education',
+    'Entertainment',
     'Other',
   ];
 

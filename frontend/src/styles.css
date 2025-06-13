@@ -31,7 +31,181 @@ body {
   font-size: 0.9rem;
 }
 
-/* .mybutton {
+.btn-primary {
   background-color: var(--bs-primary);
-  color: var(--bs-white);
-} */
+  border-color: var(--bs-primary);
+}
+
+.btn-primary:hover {
+  background-color: #e6722a;
+  border-color: #e6722a;
+}
+
+.btn-outline-primary {
+  color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+.text-primary {
+  color: var(--bs-primary) !important;
+}
+
+.bg-primary {
+  background-color: var(--bs-primary) !important;
+}
+
+.border-primary {
+  border-color: var(--bs-primary) !important;
+}
+
+.card {
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--bs-primary);
+  box-shadow: 0 0 0 0.2rem rgba(253, 128, 65, 0.25);
+}
+
+.table > :not(caption) > * > * {
+  padding: 1rem 0.75rem;
+}
+
+.table-hover > tbody > tr:hover > * {
+  background-color: rgba(253, 128, 65, 0.05);
+}
+
+.badge {
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .smallFont {
+    font-size: 0.8rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+/* pagination */
+.pagination {
+  --bs-pagination-padding-x: 0.75rem;
+  --bs-pagination-padding-y: 0.375rem;
+  --bs-pagination-font-size: 0.875rem;
+  --bs-pagination-color: #6c757d;
+  --bs-pagination-bg: #fff;
+  --bs-pagination-border-width: 1px;
+  --bs-pagination-border-color: #dee2e6;
+  --bs-pagination-border-radius: 0.375rem;
+  --bs-pagination-hover-color: #0056b3;
+  --bs-pagination-hover-bg: #e9ecef;
+  --bs-pagination-hover-border-color: #dee2e6;
+  --bs-pagination-focus-color: #0056b3;
+  --bs-pagination-focus-bg: #e9ecef;
+  --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  --bs-pagination-active-color: #fff;
+  --bs-pagination-active-bg: #0d6efd;
+  --bs-pagination-active-border-color: #0d6efd;
+  --bs-pagination-disabled-color: #6c757d;
+  --bs-pagination-disabled-bg: #fff;
+  --bs-pagination-disabled-border-color: #dee2e6;
+}
+
+.page-link {
+  position: relative;
+  display: block;
+  color: var(--bs-pagination-color);
+  text-decoration: none;
+  background-color: var(--bs-pagination-bg);
+  border: var(--bs-pagination-border-width) solid
+    var(--bs-pagination-border-color);
+  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.page-link:hover {
+  z-index: 2;
+  color: var(--bs-pagination-hover-color);
+  background-color: var(--bs-pagination-hover-bg);
+  border-color: var(--bs-pagination-hover-border-color);
+}
+
+.page-link:focus {
+  z-index: 3;
+  color: var(--bs-pagination-focus-color);
+  background-color: var(--bs-pagination-focus-bg);
+  outline: 0;
+  box-shadow: var(--bs-pagination-focus-box-shadow);
+}
+
+.page-item:not(:first-child) .page-link {
+  margin-left: -1px;
+}
+
+.page-item.active .page-link {
+  z-index: 3;
+  color: var(--bs-pagination-active-color);
+  background-color: var(--bs-pagination-active-bg);
+  border-color: var(--bs-pagination-active-border-color);
+}
+
+.page-item.disabled .page-link {
+  color: var(--bs-pagination-disabled-color);
+  pointer-events: none;
+  background-color: var(--bs-pagination-disabled-bg);
+  border-color: var(--bs-pagination-disabled-border-color);
+}
+
+.page-link {
+  padding: var(--bs-pagination-padding-y) var(--bs-pagination-padding-x);
+  font-size: var(--bs-pagination-font-size);
+  border-radius: var(--bs-pagination-border-radius);
+}
+
+.page-item:first-child .page-link {
+  border-top-left-radius: var(--bs-pagination-border-radius);
+  border-bottom-left-radius: var(--bs-pagination-border-radius);
+}
+
+.page-item:last-child .page-link {
+  border-top-right-radius: var(--bs-pagination-border-radius);
+  border-bottom-right-radius: var(--bs-pagination-border-radius);
+}
+
+.pagination .page-link {
+  min-width: 40px;
+  text-align: center;
+}
+
+.pagination .page-item.disabled .page-link {
+  opacity: 0.6;
+}
+
+.pagination .page-item.active .page-link {
+  font-weight: 600;
+}
+
+/* Responsive pagination */
+@media (max-width: 576px) {
+  .pagination {
+    justify-content: center;
+  }
+
+  .pagination .page-item:not(.active):not(:first-child):not(:last-child) {
+    display: none;
+  }
+}
