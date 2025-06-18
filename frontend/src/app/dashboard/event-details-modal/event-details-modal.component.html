@@ -2,6 +2,9 @@
     <h4 class="modal-title textSecondary fw-bold">
         Event Details
     </h4>
+    <span *ngIf="isUserBooked" class="badge bg-success">
+        <i class="fas fa-check-circle me-1"></i>You're Booked!
+    </span>
     <button type="button" class="btn-close" (click)="dismiss()"></button>
 </div>
 

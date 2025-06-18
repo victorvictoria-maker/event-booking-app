@@ -8,6 +8,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventDetailsModalComponent } from '../event-details-modal/event-details-modal.component';
 import { EventPaginationComponent } from '../event-pagination/event-pagination.component';
 import categories from '../../data/eventCategories';
+import { BookingService } from '../../services/booking.service';
 
 @Component({
   selector: 'app-user-event-management',
@@ -24,6 +25,8 @@ export class UserEventManagementComponent {
   events: Event[] = [];
   filteredEvents: Event[] = [];
   isLoading = signal(false);
+  userBookings: any[] = [];
+  isBookingLoading = signal(false);
 
   paginationData: PaginationData = {
     currentPage: 1,
@@ -45,11 +48,13 @@ export class UserEventManagementComponent {
 
   constructor(
     private eventService: EventService,
+    private bookingService: BookingService,
     private modalService: NgbModal
   ) {}
 
   ngOnInit() {
     this.loadEvents();
+    this.loadUserBookings();
   }
 
   loadEvents(page: number = 1) {
@@ -82,6 +87,18 @@ export class UserEventManagementComponent {
           alert('Failed to load events: ' + error.message);
         },
       });
+  }
+
+  loadUserBookings() {
+    this.bookingService.getUserBookings().subscribe({
+      next: (response) => {
+        this.userBookings = response.data?.bookings || [];
+      },
+      error: (error) => {
+        console.error('Failed to load user bookings:', error.message);
+        alert('Failed to load user bookings:' + error.message);
+      },
+    });
   }
 
   onFiltersChange(newFilters: EventFilters) {
@@ -124,6 +141,8 @@ export class UserEventManagementComponent {
     });
 
     modalRef.componentInstance.event = event;
+    modalRef.componentInstance.userBookings = this.userBookings;
+    modalRef.componentInstance.isBookingInProgress = this.isBookingInProgress;
 
     modalRef.componentInstance.bookEvent.subscribe((eventData: Event) => {
       this.onBookEvent(eventData);
@@ -131,7 +150,92 @@ export class UserEventManagementComponent {
   }
 
   onBookEvent(event: Event) {
-    alert('Booking event coming soon.');
+    const userBooking = this.getUserBookingForEvent(event._id);
+
+    if (userBooking) {
+      this.cancelBooking(userBooking._id, event);
+    } else {
+      this.createBooking(event);
+    }
+  }
+
+  private createBooking(event: Event) {
+    if (!this.isEventBookable(event)) {
+      alert('This event is not available for booking.');
+      return;
+    }
+
+    this.isBookingLoading.set(true);
+
+    this.bookingService.createBooking(event._id).subscribe({
+      next: (response) => {
+        this.isBookingLoading.set(false);
+        alert('Event booked successfully!');
+
+        this.loadEvents(this.paginationData.currentPage);
+        this.loadUserBookings();
+      },
+      error: (error) => {
+        this.isBookingLoading.set(false);
+        console.error('Failed to book event:', error.message);
+        alert('Failed to book event: ' + error.message);
+      },
+    });
+  }
+
+  private cancelBooking(bookingId: string, event: Event) {
+    this.isBookingLoading.set(true);
+
+    this.bookingService.cancelBooking(bookingId).subscribe({
+      next: (response) => {
+        this.isBookingLoading.set(false);
+        alert('Booking cancelled successfully!');
+
+        this.loadEvents(this.paginationData.currentPage);
+        this.loadUserBookings();
+      },
+      error: (error) => {
+        this.isBookingLoading.set(false);
+        console.error('Failed to cancel booking:', error.message);
+        alert('Failed to cancel booking: ' + error.message);
+      },
+    });
+  }
+
+  private isEventBookable(event: Event): boolean {
+    const availableSeats = event.totalSeats - event.bookedSeats;
+    return event.status === 'active' && availableSeats > 0;
+  }
+
+  private getUserBookingForEvent(eventId: string): any {
+    return this.userBookings.find(
+      (booking) => booking.eventId === eventId || booking.event?._id === eventId
+    );
+  }
+
+  hasUserBookedEvent(eventId: string): boolean {
+    return !!this.getUserBookingForEvent(eventId);
+  }
+
+  getBookingButtonText(event: Event): string {
+    if (this.hasUserBookedEvent(event._id)) {
+      return 'Cancel';
+    }
+
+    const availableSeats = event.totalSeats - event.bookedSeats;
+    if (availableSeats === 0) {
+      return 'Sold Out';
+    }
+
+    return 'Book';
+  }
+
+  isBookingButtonDisabled(event: Event): boolean {
+    if (this.hasUserBookedEvent(event._id)) {
+      return false;
+    }
+
+    return !this.isEventBookable(event);
   }
 
   getAvailableEventsCount(): number {
@@ -149,5 +253,9 @@ export class UserEventManagementComponent {
       (acc, event) => acc + (event.totalSeats - event.bookedSeats),
       0
     );
+  }
+
+  get isBookingInProgress() {
+    return this.isBookingLoading();
   }
 }

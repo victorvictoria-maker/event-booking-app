@@ -116,8 +116,8 @@ export class EventService {
       price: eventData.isFree ? 0 : eventData.price || 0,
     };
 
-    console.log('Creating Token:', this.auth.getToken());
-    console.log('Creating Token:', this.getAuthHeaders());
+    // console.log('Creating Token:', this.auth.getToken());
+    // console.log('Creating Token:', this.getAuthHeaders());
 
     return this.http
       .post(`${this.api}/event/create`, data, {
@@ -202,7 +202,7 @@ export class EventService {
   }
 
   toggleEventStatus(eventId: string): Observable<any> {
-    console.log(eventId);
+    // console.log(eventId);
     return this.http
       .patch(
         `${this.api}/event/${eventId}/toggle-status`,
@@ -230,7 +230,7 @@ export class EventService {
   }
 
   private handleError(error: HttpErrorResponse) {
-    console.error('HTTP Error:', error);
+    // console.error('HTTP Error:', error);
     const errorMessage =
       error.error?.message || error.message || 'An error occurred';
     return throwError(() => new Error(errorMessage));
