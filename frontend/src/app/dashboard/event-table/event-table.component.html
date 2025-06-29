@@ -24,8 +24,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let event of events" class="align-middle"
-                        [class.table-success]="mode === 'user' && hasUserBookedEvent(event._id)">
+                    <tr *ngFor="let event of events" class="align-middle">
+                        <!-- [class.table-success]="mode === 'user' && hasUserBookedEvent(event._id)" -->
                         <td>
                             <div class="d-flex align-items-start">
                                 <!-- <div *ngIf="mode === 'user' && hasUserBookedEvent(event._id)" class="me-2">
@@ -91,7 +91,7 @@
                         </td>
 
                         <td>
-                            <span class="badge" [class]="getStatusBadgeClass(event.status)">
+                            <span class="badge" [class]="getEventStatusBadgeClass(event.status)">
                                 {{ getEventStatusText(event) | titlecase }}
                             </span>
                         </td>
@@ -99,11 +99,13 @@
 
                         <td class="text-center">
                             <div *ngIf="mode === 'admin'" class="btn-group" role="group">
-                                <button class="btn btn-sm btn-outline-primary" (click)="onEditEvent(event)"
+                                <button *ngIf="event.status !== 'completed' && !isEventPast(event)"
+                                    class="btn btn-sm btn-outline-primary" (click)="onEditEvent(event)"
                                     title="Edit Event">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-warning" (click)="onToggleEventStatus(event._id)"
+                                <button *ngIf="event.status !== 'completed' && !isEventPast(event)"
+                                    class="btn btn-sm btn-outline-warning" (click)="onToggleEventStatus(event._id)"
                                     [title]="event.status === 'active' ? 'Cancel Event' : 'Activate Event'">
                                     <i [class]="event.status === 'active' ? 'fas fa-pause' : 'fas fa-play'"></i>
                                 </button>
@@ -123,8 +125,9 @@
                                 <button [class]="getBookingButtonClass(event)" (click)="onBookEvent(event)"
                                     [disabled]="isBookingButtonDisabled(event)"
                                     [title]="hasUserBookedEvent(event._id) ? 'Cancel your booking' : 'Book this event'">
-                                    <span *ngIf="isBookingInProgress" class="spinner-border spinner-border-sm me-1"
-                                        role="status"></span>
+                                    <span *ngIf="isBookingInProgress(event._id)"
+                                        class="spinner-border spinner-border-sm me-1" role="status"></span>
+
 
                                     <i *ngIf="!isBookingInProgress"
                                         [class]="hasUserBookedEvent(event._id) ? 'fas fa-times me-1' : 'fas fa-ticket-alt me-1'"></i>

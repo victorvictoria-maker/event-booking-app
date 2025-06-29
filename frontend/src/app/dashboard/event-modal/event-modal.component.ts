@@ -1,5 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  OnInit,
+  Output,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -30,7 +37,10 @@ export class EventModalComponent implements OnInit {
   isLoading = false;
   minDate: string;
 
-  constructor(private fb: FormBuilder, public activeModal: NgbActiveModal) {
+  private fb = inject(FormBuilder);
+  public activeModal = inject(NgbActiveModal);
+
+  constructor() {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     this.minDate = tomorrow.toISOString().split('T')[0];

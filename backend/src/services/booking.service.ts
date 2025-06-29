@@ -109,11 +109,9 @@ class BookingService extends RootService {
     }
   };
 
-  getEventBookings = async (req: Request, res: Response) => {
+  getAllBookings = async (req: Request, res: Response) => {
     try {
-      const { eventId } = req.params;
-      const userId = (req as any).user.userId;
-      const data = await BookingController.getEventBookings();
+      const data = await BookingController.getAllBookings(req.query);
 
       this.sendResponse({
         req,

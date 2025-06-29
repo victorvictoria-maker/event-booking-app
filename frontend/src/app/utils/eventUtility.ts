@@ -31,7 +31,7 @@ export class EventUtilsService {
     return event.status;
   }
 
-  getStatusBadgeClass(status: string): string {
+  getEventStatusBadgeClass(status: string): string {
     switch (status) {
       case 'active':
         return 'bg-success';
@@ -85,5 +85,11 @@ export class EventUtilsService {
     }
 
     return `${baseClass} btn-primary`;
+  }
+
+  isEventPast(event: Event): boolean {
+    const eventDate = new Date(event.date);
+    const currentDate = new Date();
+    return eventDate < currentDate;
   }
 }

@@ -69,10 +69,28 @@ export class BookingService {
       );
   }
 
-  getUserBookings(page: number = 1, limit: number = 10): Observable<any> {
+  getUserBookings(
+    page: number = 1,
+    limit: number = 10,
+    status?: string,
+    searchTerm?: string,
+    category?: string
+  ): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
+
+    if (status) {
+      params = params.set('status', status);
+    }
+
+    if (searchTerm && searchTerm.trim()) {
+      params = params.set('search', searchTerm.trim());
+    }
+
+    if (category && category.trim()) {
+      params = params.set('category', category.trim());
+    }
 
     return this.http
       .get(`${this.api}/bookings/my-bookings`, {
@@ -137,17 +155,13 @@ export class BookingService {
       );
   }
 
-  getEventBookings(
-    eventId: string,
-    page: number = 1,
-    limit: number = 10
-  ): Observable<any> {
+  getAllBookings(page: number = 1, limit: number = 10): Observable<any> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('limit', limit.toString());
 
     return this.http
-      .get(`${this.api}/bookings/event/${eventId}`, {
+      .get(`${this.api}/bookings`, {
         headers: this.getAuthHeaders(),
         params,
       })

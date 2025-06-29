@@ -1,6 +1,5 @@
 import * as express from "express";
 import chalk = require("chalk");
-import env from "../env";
 
 import authRoute from "./auth.route";
 import eventRoute from "./event.route";

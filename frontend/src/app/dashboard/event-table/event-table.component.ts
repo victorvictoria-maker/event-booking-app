@@ -17,7 +17,7 @@ export class EventTableComponent {
   @Input() isLoading: boolean = false;
   @Input() totalEvents: number = 0;
   @Input() userBookings: any[] = [];
-  @Input() isBookingInProgress: boolean = false;
+  @Input() bookingLoadingStates: Record<string, boolean> = {};
 
   @Output() editEvent = new EventEmitter<Event>();
   @Output() deleteEvent = new EventEmitter<string>();
@@ -49,85 +49,12 @@ export class EventTableComponent {
     this.viewEvent.emit(event);
   }
 
-  // getAvailableSeats(event: Event): number {
-  //   return event.totalSeats - event.bookedSeats;
-  // }
-
-  // getStatusBadgeClass(status: string): string {
-  //   switch (status) {
-  //     case 'active':
-  //       return 'bg-success';
-  //     case 'cancelled':
-  //       return 'bg-danger';
-  //     case 'completed':
-  //       return 'bg-secondary';
-  //     default:
-  //       return 'bg-secondary';
-  //   }
-  // }
-
-  // getBookingPercentage(event: Event): number {
-  //   return (event.bookedSeats / event.totalSeats) * 100;
-  // }
-
-  // formatPrice(event: Event): string {
-  //   if (event.isFree) {
-  //     return 'Free';
-  //   }
-  //   return event.price ? `₦${event.price.toLocaleString()}` : 'Free';
-  // }
-
-  // isEventBookable(event: Event): boolean {
-  //   return event.status === 'active' && this.getAvailableSeats(event) > 0;
-  // }
-
-  // getEventStatusText(event: Event): string {
-  //   if (event.status === 'active' && this.getAvailableSeats(event) === 0) {
-  //     return 'Sold Out';
-  //   }
-  //   return event.status;
-  // }
-
-  // hasUserBookedEvent(eventId: string): boolean {
-  //   return this.userBookings.some(
-  //     (booking) => booking.eventId === eventId || booking.event?._id === eventId
-  //   );
-  // }
-
-  // getBookingButtonText(event: Event): string {
-  //   if (this.hasUserBookedEvent(event._id)) {
-  //     return 'Cancel';
-  //   }
-
-  //   const availableSeats = this.getAvailableSeats(event);
-  //   if (availableSeats === 0) {
-  //     return 'Sold Out';
-  //   }
-
-  //   return 'Book';
-  // }
-
-  // isBookingButtonDisabled(event: Event): boolean {
-  //   if (this.hasUserBookedEvent(event._id)) {
-  //     return false;
-  //   }
-
-  //   return !this.isEventBookable(event);
-  // }
-
-  // getBookingButtonClass(event: Event): string {
-  //   if (this.hasUserBookedEvent(event._id)) {
-  //     return 'btn btn-sm btn-danger';
-  //   }
-
-  //   return 'btn btn-sm btn-primary';
-  // }
   getAvailableSeats(event: Event): number {
     return this.eventUtils.getAvailableSeats(event);
   }
 
-  getStatusBadgeClass(status: string): string {
-    return this.eventUtils.getStatusBadgeClass(status);
+  getEventStatusBadgeClass(status: string): string {
+    return this.eventUtils.getEventStatusBadgeClass(status);
   }
 
   getBookingPercentage(event: Event): number {
@@ -157,7 +84,7 @@ export class EventTableComponent {
   isBookingButtonDisabled(event: Event): boolean {
     return (
       this.eventUtils.isBookingButtonDisabled(event, this.userBookings) ||
-      this.isBookingInProgress
+      this.isBookingInProgress(event._id)
     );
   }
 
@@ -167,5 +94,13 @@ export class EventTableComponent {
       this.userBookings,
       'btn btn-sm'
     );
+  }
+
+  isBookingInProgress(eventId: string): boolean {
+    return this.bookingLoadingStates[eventId] || false;
+  }
+
+  isEventPast(event: Event): boolean {
+    return this.eventUtils.isEventPast(event);
   }
 }

@@ -70,8 +70,8 @@
 
 
     <app-event-table [events]="filteredEvents" [mode]="'user'" [isLoading]="isLoading()" [userBookings]="userBookings"
-        [isBookingInProgress]="isBookingInProgress" (viewEvent)="onViewEvent($event)" (bookEvent)="onBookEvent($event)"
-        [totalEvents]="paginationData.totalItems"></app-event-table>
+        [bookingLoadingStates]="bookingLoadingStates()" (viewEvent)="onViewEvent($event)"
+        (bookEvent)="onBookEvent($event)" [totalEvents]="paginationData.totalItems"></app-event-table>
 
 
     <app-event-pagination [paginationData]="paginationData" ariaLabel="Available events pagination"

@@ -18,8 +18,7 @@ export class EventDetailsModalComponent {
   @Output() bookEvent = new EventEmitter<Event>();
 
   private eventUtils = inject(EventUtilsService);
-
-  constructor(public activeModal: NgbActiveModal) {}
+  public activeModal = inject(NgbActiveModal);
 
   onBookEvent() {
     this.bookEvent.emit(this.event);
@@ -49,8 +48,8 @@ export class EventDetailsModalComponent {
     return this.eventUtils.isEventBookable(this.event);
   }
 
-  getStatusBadgeClass(): string {
-    return this.eventUtils.getStatusBadgeClass(this.event.status);
+  getEventStatusBadgeClass(): string {
+    return this.eventUtils.getEventStatusBadgeClass(this.event.status);
   }
 
   getEventStatusText(): string {

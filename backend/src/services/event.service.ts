@@ -86,14 +86,8 @@ class EventService extends RootService {
     try {
       const { id } = req.params;
       const userId = (req as any).user.userId;
-      const isAdmin = (req as any).user.isAdmin || false;
 
-      const data = await EventController.updateEvent(
-        id,
-        req.body,
-        userId,
-        isAdmin
-      );
+      const data = await EventController.updateEvent(id, req.body, userId);
 
       this.sendResponse({
         req,
@@ -119,9 +113,8 @@ class EventService extends RootService {
     try {
       const { id } = req.params;
       const userId = (req as any).user.userId;
-      const isAdmin = (req as any).user.isAdmin || false;
 
-      const data = await EventController.deleteEvent(id, userId, isAdmin);
+      const data = await EventController.deleteEvent(id, userId);
 
       this.sendResponse({
         req,
@@ -147,9 +140,8 @@ class EventService extends RootService {
     try {
       const { id } = req.params;
       const userId = (req as any).user.userId;
-      const isAdmin = (req as any).user.isAdmin || false;
 
-      const data = await EventController.toggleEventStatus(id, userId, isAdmin);
+      const data = await EventController.toggleEventStatus(id, userId);
 
       this.sendResponse({
         req,
@@ -171,16 +163,16 @@ class EventService extends RootService {
     }
   };
 
-  getEventsByCategory = async (req: Request, res: Response) => {
+  getEventStats = async (req: Request, res: Response) => {
     try {
-      const data = await EventController.getEventsByCategory();
+      const data = await EventController.getEventStats();
 
       this.sendResponse({
         req,
         res,
         status: SUCCESS,
         data,
-        message: "Events by category gotten successfully",
+        message: "Event statistics retrieved successfully",
       });
     } catch (error) {
       const { status, message, data } = this.get_error(error);
@@ -188,7 +180,7 @@ class EventService extends RootService {
         req,
         res,
         status: status || ERROR,
-        message: message || "Failed to get events by category",
+        message: message || "Failed to retrieve event statistics",
         data,
         error,
       });

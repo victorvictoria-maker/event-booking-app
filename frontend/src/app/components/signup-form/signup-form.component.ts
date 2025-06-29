@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, signal } from '@angular/core';
+import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -8,6 +8,7 @@ import {
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-signup-form',
@@ -33,11 +34,12 @@ export class SignupFormComponent implements OnInit {
   @Input() isAdmin: boolean = false;
   @Input() title: string = 'Join Us';
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
+  private toastr = inject(ToastrService);
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  constructor() {
     this.signupForm = this.fb.group(
       {
         username: ['', Validators.required],
@@ -100,8 +102,7 @@ export class SignupFormComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading.set(false);
-        alert(error.message);
-        console.error('Signup failed:', error.message);
+        this.toastr.error('Signup failed:', error.message);
       },
     });
   }

@@ -12,6 +12,7 @@ export interface Booking {
     date: Date;
     venue: string;
     price: number;
+    time: string;
     isFree: boolean;
     category: string;
     totalSeats: number;

@@ -52,55 +52,47 @@ export class EventService {
       }
     }
 
-    return this.http.get(`${this.api}/event`, { params }).pipe(
-      map((res: any) => {
-        if (res.status === 'SUCCESS') {
-          // console.log(res.data);
-          return {
-            status: 'SUCCESS',
-            data: res.data,
-            message: res.message || 'Events retrieved successfully',
-          };
-        } else {
-          throw new Error(res.message || 'Failed to fetch events');
-        }
-      }),
-      catchError(this.handleError)
-    );
-  }
-
-  getEventStatsByCategory(): Observable<any> {
-    return this.http.get<any>(`${this.api}/event/stats/categories`).pipe(
-      map((res: any) => {
-        if (res.status === 'SUCCESS') {
-          return {
-            status: 'SUCCESS',
-            data: res.data,
-            message: res.message || 'Event stats retrieved successfully',
-          };
-        } else {
-          throw new Error(res.message || 'Event stats not found');
-        }
-      }),
-      catchError(this.handleError)
-    );
+    return this.http
+      .get(`${this.api}/event`, {
+        headers: this.getAuthHeaders(),
+        params,
+      })
+      .pipe(
+        map((res: any) => {
+          if (res.status === 'SUCCESS') {
+            // console.log(res.data);
+            return {
+              status: 'SUCCESS',
+              data: res.data,
+              message: res.message || 'Events retrieved successfully',
+            };
+          } else {
+            throw new Error(res.message || 'Failed to fetch events');
+          }
+        }),
+        catchError(this.handleError)
+      );
   }
 
   getEventById(eventId: string): Observable<any> {
-    return this.http.get(`${this.api}/event/${eventId}`).pipe(
-      map((res: any) => {
-        if (res.status === 'SUCCESS') {
-          return {
-            status: 'SUCCESS',
-            data: res.data,
-            message: res.message || 'Event retrieved successfully',
-          };
-        } else {
-          throw new Error(res.message || 'Event not found');
-        }
-      }),
-      catchError(this.handleError)
-    );
+    return this.http
+      .get(`${this.api}/event/${eventId}`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        map((res: any) => {
+          if (res.status === 'SUCCESS') {
+            return {
+              status: 'SUCCESS',
+              data: res.data,
+              message: res.message || 'Event retrieved successfully',
+            };
+          } else {
+            throw new Error(res.message || 'Event not found');
+          }
+        }),
+        catchError(this.handleError)
+      );
   }
 
   createEvent(eventData: Event): Observable<any> {
@@ -111,13 +103,9 @@ export class EventService {
       time: eventData.time,
       totalSeats: eventData.totalSeats,
       category: eventData.category?.toLowerCase(),
-      // location: eventData.venue,
       venue: eventData.venue,
       price: eventData.isFree ? 0 : eventData.price || 0,
     };
-
-    // console.log('Creating Token:', this.auth.getToken());
-    // console.log('Creating Token:', this.getAuthHeaders());
 
     return this.http
       .post(`${this.api}/event/create`, data, {
@@ -152,7 +140,6 @@ export class EventService {
       time: eventData.time,
       totalSeats: eventData.totalSeats,
       category: eventData.category?.toLowerCase(),
-      // location: eventData.venue,
       venue: eventData.venue,
       price: eventData.isFree ? 0 : eventData.price || 0,
     };
@@ -202,7 +189,6 @@ export class EventService {
   }
 
   toggleEventStatus(eventId: string): Observable<any> {
-    // console.log(eventId);
     return this.http
       .patch(
         `${this.api}/event/${eventId}/toggle-status`,
@@ -229,8 +215,28 @@ export class EventService {
       );
   }
 
+  getEventStats(): Observable<any> {
+    return this.http
+      .get(`${this.api}/event/stats`, {
+        headers: this.getAuthHeaders(),
+      })
+      .pipe(
+        map((res: any) => {
+          if (res.status === 'SUCCESS') {
+            return {
+              status: 'SUCCESS',
+              data: res.data,
+              message: res.message || 'Event statistics retrieved successfully',
+            };
+          } else {
+            throw new Error(res.message || 'Failed to fetch event statistics');
+          }
+        }),
+        catchError(this.handleError)
+      );
+  }
+
   private handleError(error: HttpErrorResponse) {
-    // console.error('HTTP Error:', error);
     const errorMessage =
       error.error?.message || error.message || 'An error occurred';
     return throwError(() => new Error(errorMessage));

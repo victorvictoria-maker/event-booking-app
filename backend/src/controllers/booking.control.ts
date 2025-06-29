@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import BookingModel from "../models/booking.model";
 import EventModel from "../models/event.model";
 import { RootController } from "./_root.control";
+import { EventBookingUtils } from "../utilities/eventbooking.util";
 
 class BookingController extends RootController {
   constructor() {
@@ -23,8 +24,13 @@ class BookingController extends RootController {
         throw new Error("Event is not available for booking");
       }
 
-      const availableSeats = event.totalSeats - event.bookedSeats;
-      if (availableSeats < 1) {
+      const bookedSeats = await BookingModel.countDocuments({
+        event: eventId,
+      }).session(session);
+
+      const availableSeats = event.totalSeats - bookedSeats;
+
+      if (availableSeats <= 0) {
         throw new Error("No more available seats for this event");
       }
 
@@ -48,27 +54,28 @@ class BookingController extends RootController {
 
       const savedBooking = await booking.save({ session });
 
-      await EventModel.findByIdAndUpdate(
-        eventId,
-        {
-          $inc: { bookedSeats: 1 },
-          $set: {
-            availableSeats: event.totalSeats - (event.bookedSeats + 1),
-          },
-        },
-        { session }
-      );
-
       await session.commitTransaction();
 
       const bookingResponse = await BookingModel.findById(savedBooking._id)
         .populate("user", "username email")
-        .populate(
-          "event",
-          "name date venue price isFree totalSeats bookedSeats"
-        );
+        .populate("event", "name date venue price isFree totalSeats");
 
-      return bookingResponse?.toJSON();
+      if (bookingResponse) {
+        const eventBookedSeats = await BookingModel.countDocuments({
+          event: eventId,
+        });
+        const eventAvailableSeats = event.totalSeats - eventBookedSeats;
+
+        const response = bookingResponse.toJSON();
+        if (response.event) {
+          response.event.bookedSeats = eventBookedSeats;
+          response.event.availableSeats = eventAvailableSeats;
+        }
+
+        return response;
+      }
+
+      return bookingResponse ? (bookingResponse as any).toJSON() : null;
     } catch (error) {
       await session.abortTransaction();
       throw error;
@@ -82,10 +89,7 @@ class BookingController extends RootController {
     session.startTransaction();
 
     try {
-      const booking = await BookingModel.findById(bookingId).session(session);
-      if (!booking) {
-        throw new Error("Booking not found");
-      }
+      const booking = await EventBookingUtils.findBookingById(bookingId);
 
       const event = await EventModel.findById(booking.event).session(session);
       if (!event) {
@@ -93,17 +97,6 @@ class BookingController extends RootController {
       }
 
       await BookingModel.findByIdAndDelete(bookingId, { session });
-
-      await EventModel.findByIdAndUpdate(
-        booking.event,
-        {
-          $inc: { bookedSeats: -1 },
-          $set: {
-            availableSeats: event.availableSeats + 1,
-          },
-        },
-        { session }
-      );
 
       await session.commitTransaction();
 
@@ -131,7 +124,7 @@ class BookingController extends RootController {
       };
 
       const bookings = await BookingModel.find(searchCriteria)
-        .populate("event", "name date venue price isFree category status")
+        .populate("event", "name date time venue price isFree category status")
         .skip(skip)
         .limit(limit)
         .sort(sortCriteria)
@@ -161,7 +154,7 @@ class BookingController extends RootController {
         .populate("user", "username email")
         .populate(
           "event",
-          "name description date venue price isFree category totalSeats bookedSeats organizer"
+          "name description date venue price isFree category totalSeats organizer"
         )
         .exec();
 
@@ -175,8 +168,43 @@ class BookingController extends RootController {
     }
   }
 
-  async getEventBookings() {
-    console.log("Would implement this for admin");
+  async getAllBookings(queryParams: any = {}) {
+    try {
+      const page = parseInt(queryParams.page) || 1;
+      const limit = parseInt(queryParams.limit) || 10;
+      const skip = (page - 1) * limit;
+
+      // const organizerEvents = await EventModel.find({
+      //   organizer: organizerId,
+      // }).select("_id");
+      // const eventIds = organizerEvents.map((event) => event._id);
+
+      const searchCriteria: any = {};
+
+      const bookings = await BookingModel.find(searchCriteria)
+        .populate("user", "username email")
+        .populate("event", "name date time venue price isFree category status")
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .exec();
+
+      const total = await BookingModel.countDocuments(searchCriteria);
+
+      return {
+        bookings,
+        pagination: {
+          currentPage: page,
+          totalPages: Math.ceil(total / limit),
+          totalItems: total,
+          itemsPerPage: limit,
+          hasNextPage: page < Math.ceil(total / limit),
+          hasPrevPage: page > 1,
+        },
+      };
+    } catch (error) {
+      throw error;
+    }
   }
 
   async getBookingStats(userId: string) {

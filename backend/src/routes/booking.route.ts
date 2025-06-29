@@ -1,6 +1,5 @@
 import { Router } from "express";
 import Joi from "../middlewares/validator.middleware";
-// import bookingValidator from "../validations/booking.validator";
 import BookingService from "../services/booking.service";
 import AuthMiddleware from "../middlewares/auth.middleware";
 import bookingValidator from "../validations/booking.validator";
@@ -11,14 +10,14 @@ class BookingRoute {
     this.cancelBooking(prefix, router);
     this.getUserBookings(prefix, router);
     this.getBookingById(prefix, router);
-    this.getEventBookings(prefix, router);
+    this.getAllBookings(prefix, router);
     this.getBookingStats(prefix, router);
   }
 
   private createBooking(prefix: string, router: Router) {
     router.post(
       `${prefix}/create`,
-      AuthMiddleware.auth,
+      AuthMiddleware.userOnly,
       Joi.validator(bookingValidator.createBooking),
       BookingService.createBooking
     );
@@ -27,7 +26,7 @@ class BookingRoute {
   private cancelBooking(prefix: string, router: Router) {
     router.delete(
       `${prefix}/:id/cancel`,
-      AuthMiddleware.auth,
+      AuthMiddleware.userOnly,
       BookingService.cancelBooking
     );
   }
@@ -35,7 +34,7 @@ class BookingRoute {
   private getUserBookings(prefix: string, router: Router) {
     router.get(
       `${prefix}/my-bookings`,
-      AuthMiddleware.auth,
+      AuthMiddleware.userOnly,
       BookingService.getUserBookings
     );
   }
@@ -48,11 +47,11 @@ class BookingRoute {
     );
   }
 
-  private getEventBookings(prefix: string, router: Router) {
+  private getAllBookings(prefix: string, router: Router) {
     router.get(
-      `${prefix}/event/:eventId`,
-      AuthMiddleware.auth,
-      BookingService.getEventBookings
+      `${prefix}/`,
+      AuthMiddleware.adminOnly,
+      BookingService.getAllBookings
     );
   }
 
