@@ -14,10 +14,9 @@ export class DashboardLayoutComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  @Input()
-  userName: string = 'Victoria Victor';
   @Output() logout = new EventEmitter<void>();
 
+  userName = '';
   userRole = '';
   isSidebarCollapsed = false;
   searchQuery = '';
@@ -29,6 +28,7 @@ export class DashboardLayoutComponent {
       : (this.userRole = 'user');
 
     this.setMenuItems();
+    this.userName = this.authService.getUsername() ?? '';
   }
 
   logOut() {
@@ -76,7 +76,7 @@ export class DashboardLayoutComponent {
       ];
     } else {
       this.menuItems = [
-        { icon: 'fas fa-home', label: 'Home', route: '/dashboard' },
+        // { icon: 'fas fa-home', label: 'Home', route: '/dashboard' },
         {
           icon: 'fas fa-calendar',
           label: 'Browse Events',

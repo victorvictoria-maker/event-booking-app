@@ -199,10 +199,10 @@
                             </td>
                             <td>
                                 <div class="textSecondary smallFont">
-                                    {{ booking.bookingDate | date:'MMM dd, yyyy' }}
+                                    {{ booking.createdAt | date:'MMM dd, yyyy' }}
                                 </div>
                                 <div class="textGray smallFont">
-                                    {{ booking.bookingDate | date:'HH:mm' }}
+                                    {{ booking.createdAt | date:'HH:mm' }}
                                 </div>
                             </td>
                             <td class="text-center">
@@ -313,7 +313,7 @@
                         </div>
                         <div class="mb-2">
                             <strong>Booking Date:</strong>
-                            {{ selectedBooking.bookingDate | date:'MMM dd, yyyy HH:mm' }}
+                            {{ selectedBooking.createdAt | date:'MMM dd, yyyy HH:mm' }}
                         </div>
                         <div class="mb-2">
                             <strong>Payment Status:</strong>

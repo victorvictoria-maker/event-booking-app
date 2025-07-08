@@ -42,13 +42,13 @@ export const routes: Routes = [
       ),
     canActivate: [AuthGuard],
     children: [
-      {
-        path: 'dashboard',
-        loadComponent: () =>
-          import('./dashboard/user-dashboard/user-dashboard.component').then(
-            (m) => m.UserDashboardComponent
-          ),
-      },
+      // {
+      //   path: 'dashboard',
+      //   loadComponent: () =>
+      //     import('./dashboard/user-dashboard/user-dashboard.component').then(
+      //       (m) => m.UserDashboardComponent
+      //     ),
+      // },
       {
         path: 'events',
         loadComponent: () =>
@@ -66,8 +66,8 @@ export const routes: Routes = [
       {
         path: 'profile',
         loadComponent: () =>
-          import('./dashboard/user-dashboard/user-dashboard.component').then(
-            (m) => m.UserDashboardComponent
+          import('./dashboard/user-profile/user-profile.component').then(
+            (m) => m.UserProfileComponent
           ),
       },
     ],

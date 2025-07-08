@@ -4,6 +4,7 @@ import chalk = require("chalk");
 import authRoute from "./auth.route";
 import eventRoute from "./event.route";
 import bookingRoute from "./booking.route";
+import dashboardRoute from "./dashboard.route";
 /**
  * Create and return Router.
  *
@@ -19,6 +20,7 @@ export const routes = (app: express.Application) => {
   authRoute.loadRoutes("/api/auth", router);
   eventRoute.loadRoutes("/api/event", router);
   bookingRoute.loadRoutes("/api/bookings", router);
+  dashboardRoute.loadRoutes("/api/dashboard", router);
 
   app.use(router);
 

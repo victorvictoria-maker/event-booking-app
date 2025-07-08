@@ -13,9 +13,17 @@ export class AuthService {
   router = inject(Router);
   private api = environment.apiBaseUrl;
 
-  private storeAuthData(token: string, isAdmin: boolean): void {
+  private storeAuthData(
+    token: string,
+    isAdmin: boolean,
+    username: string
+  ): void {
     localStorage.setItem('event-booking-app-token', JSON.stringify(token));
     localStorage.setItem('event-booking-is-admin', JSON.stringify(isAdmin));
+    localStorage.setItem(
+      'event-booking-app-username',
+      JSON.stringify(username)
+    );
   }
 
   register(user: User): Observable<any> {
@@ -30,8 +38,12 @@ export class AuthService {
       .pipe(
         map((res: any) => {
           if (res.status === 'CREATED' && res.data.token) {
-            this.storeAuthData(res.data.token, res.data.user.isAdmin);
-            console.log(res.data.user.isAdmin);
+            this.storeAuthData(
+              res.data.token,
+              res.data.user.isAdmin,
+              res.data.user.username
+            );
+            // console.log(res.data.user.isAdmin);
 
             return {
               success: true,
@@ -59,7 +71,11 @@ export class AuthService {
       .pipe(
         map((res: any) => {
           if (res.status === 'SUCCESS') {
-            this.storeAuthData(res.data.token, res.data.user.isAdmin);
+            this.storeAuthData(
+              res.data.token,
+              res.data.user.isAdmin,
+              res.data.user.username
+            );
 
             return {
               success: true,
@@ -96,6 +112,12 @@ export class AuthService {
   isAdmin(): boolean {
     return JSON.parse(
       localStorage.getItem('event-booking-is-admin') || 'false'
+    );
+  }
+
+  getUsername(): string | null {
+    return JSON.parse(
+      localStorage.getItem('event-booking-app-username') || 'null'
     );
   }
 

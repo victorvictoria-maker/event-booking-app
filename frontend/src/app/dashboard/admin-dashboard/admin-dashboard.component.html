@@ -1,1 +1,333 @@
-<p>Charts & co</p>
+<div class="container-fluid p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="textSecondary fw-bold mb-1">Admin Dashboard</h2>
+            <p class="textGray mb-0">Monitor your event management platform performance</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-outline-primary" (click)="refreshDashboard()" [disabled]="isRefreshing()">
+                <i class="fas fa-sync-alt me-2" [class.fa-spin]="isRefreshing()"></i>
+                Refresh
+            </button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 textGray">Loading dashboard data...</p>
+    </div>
+
+
+    <div *ngIf="!isLoading() && dashboardData">
+        <!-- Overview Stats Cards -->
+        <div class="row mb-4">
+            <div class="col-lg-4 col-md-6 mb-3">
+                <div class="card border-0 bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title opacity-75 mb-1">Total Events</h6>
+                                <h3 class="mb-0">{{ dashboardData.overview.totalEvents | numberFormat }}</h3>
+                            </div>
+                            <i class="fas fa-calendar-alt fs-3 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+                <div class="card border-0 bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title opacity-75 mb-1">Total Bookings</h6>
+                                <h3 class="mb-0">{{ dashboardData.overview.totalBookings | numberFormat }}</h3>
+                            </div>
+                            <i class="fas fa-ticket-alt fs-3 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6 mb-3">
+                <div class="card border-0 bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title opacity-75 mb-1">Total Revenue</h6>
+                                <h3 class="mb-0">₦{{ dashboardData.overview.totalRevenue | numberFormat }}</h3>
+                            </div>
+                            <i class="fas fa-naira-sign fs-3 opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Date Range Filter -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h6 class="textSecondary fw-bold mb-0">Analytics Period</h6>
+                                <small class="textGray">Select date range for revenue trends & weekly booking patterns
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label smallFont">Start Date</label>
+                                        <input type="date" class="form-control" [(ngModel)]="dateRange.startDate"
+                                            (change)="onDateRangeChange()" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label smallFont">End Date</label>
+                                        <input type="date" class="form-control" [(ngModel)]="dateRange.endDate"
+                                            (change)="onDateRangeChange()" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <!-- Revenue Chart -->
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0">
+                    <div class="card-header bg-white border-0">
+                        <h6 class="textSecondary fw-bold mb-0">Revenue Trends</h6>
+                        <small class="textGray">Daily revenue over selected period</small>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 300px;"
+                            *ngIf="revenueChartData.labels && revenueChartData.labels.length > 0">
+                            <canvas baseChart [data]="revenueChartData" [options]="revenueChartOptions" type="line">
+                            </canvas>
+                        </div>
+                        <div *ngIf="!revenueChartData.labels || revenueChartData.labels.length === 0"
+                            class="text-center py-5">
+                            <i class="fas fa-chart-line fs-1 textGray mb-3"></i>
+                            <p class="textGray">No revenue data available for selected period</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bookings by Day of Week -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0">
+                    <div class="card-header bg-white border-0">
+                        <h6 class="textSecondary fw-bold mb-0">Bookings by Day</h6>
+                        <small class="textGray">Weekly booking patterns</small>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 300px;"
+                            *ngIf="bookingsByDayChartData.labels && bookingsByDayChartData.labels.length > 0">
+                            <canvas baseChart [data]="bookingsByDayChartData" [options]="bookingsByDayChartOptions"
+                                type="radar">
+                            </canvas>
+                        </div>
+                        <div *ngIf="!bookingsByDayChartData.labels || bookingsByDayChartData.labels.length === 0"
+                            class="text-center py-5">
+                            <i class="fas fa-chart-area fs-1 textGray mb-3"></i>
+                            <p class="textGray">No weekly pattern data available</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Secondary Charts Row -->
+        <div class="row mb-4">
+            <!-- Booking Trends -->
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0">
+                    <div class="card-header bg-white border-0">
+                        <h6 class="textSecondary fw-bold mb-0">Booking Trends</h6>
+                        <small class="textGray">Monthly booking trends for the last 12 months</small>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 300px;"
+                            *ngIf="bookingTrendsChartData.labels && bookingTrendsChartData.labels.length > 0">
+                            <canvas baseChart [data]="bookingTrendsChartData" [options]="bookingTrendsChartOptions"
+                                type="bar">
+                            </canvas>
+                        </div>
+                        <div *ngIf="!bookingTrendsChartData.labels || bookingTrendsChartData.labels.length === 0"
+                            class="text-center py-5">
+                            <i class="fas fa-chart-bar fs-1 textGray mb-3"></i>
+                            <p class="textGray">No booking trend data available</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Status -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0">
+                    <div class="card-header bg-white border-0">
+                        <h6 class="textSecondary fw-bold mb-0">Event Status</h6>
+                        <small class="textGray">Distribution of event statuses</small>
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 300px;"
+                            *ngIf="eventStatusChartData.labels && eventStatusChartData.labels.length > 0">
+                            <canvas baseChart [data]="eventStatusChartData" [options]="eventStatusChartOptions"
+                                type="doughnut">
+                            </canvas>
+                        </div>
+                        <div *ngIf="!eventStatusChartData.labels || eventStatusChartData.labels.length === 0"
+                            class="text-center py-5">
+                            <i class="fas fa-chart-pie fs-1 textGray mb-3"></i>
+                            <p class="textGray">No event status data available</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Recent Activity and Top Users -->
+        <div class="row">
+            <!-- Recent Bookings -->
+            <div class="col-lg-8 mb-4">
+                <div class="card border-0">
+                    <div class="card-header bg-white border-0">
+                        <h6 class="textSecondary fw-bold mb-0">Recent Bookings</h6>
+                        <small class="textGray">Latest booking activities</small>
+                    </div>
+                    <div class="card-body p-0">
+                        <div *ngIf="dashboardData.recentBookings.length === 0" class="text-center py-4">
+                            <i class="fas fa-inbox fs-1 textGray mb-3"></i>
+                            <p class="textGray">No recent bookings</p>
+                        </div>
+                        <div *ngIf="dashboardData.recentBookings.length > 0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <tbody>
+                                        <tr *ngFor="let booking of dashboardData.recentBookings">
+                                            <td class="border-0">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                                        style="width: 40px; height: 40px;">
+                                                        <i class="fas fa-user"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-semibold textSecondary">{{ booking.user.username
+                                                            }}</div>
+                                                        <small class="textGray">{{ booking.user.email }}</small>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="border-0">
+                                                <div class="fw-semibold textSecondary">{{ booking.event.name }}</div>
+                                                <small class="textGray">{{ booking.event.venue }}</small>
+                                            </td>
+                                            <td class="border-0">
+                                                <div class="fw-semibold textSecondary">₦{{ booking.totalAmount |
+                                                    numberFormat }}</div>
+                                                <small class="textGray">{{ booking.createdAt | date:'MMM dd, yyyy'
+                                                    }}</small>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Users -->
+            <div class="col-lg-4 mb-4">
+                <div class="card border-0">
+                    <div class="card-header bg-white border-0">
+                        <h6 class="textSecondary fw-bold mb-0">Top Users</h6>
+                        <small class="textGray">Most active users by bookings</small>
+                    </div>
+                    <div class="card-body">
+                        <div *ngIf="topUsers.length === 0" class="text-center py-4">
+                            <i class="fas fa-users fs-1 textGray mb-3"></i>
+                            <p class="textGray">No user data available</p>
+                        </div>
+                        <div *ngIf="topUsers.length > 0">
+                            <div *ngFor="let user of topUsers; let i = index" class="d-flex align-items-center mb-3">
+                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                    style="width: 35px; height: 35px;">
+                                    <span class="fw-bold">{{ i + 1 }}</span>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold textSecondary">{{ user.userDetails.username }}</div>
+                                    <small class="textGray">{{ user.bookingCount | pluralize: 'booking' }} </small>
+                                </div>
+                                <div class="text-end">
+                                    <div class="fw-semibold textSecondary">₦{{ user.totalSpent | numberFormat }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Most Popular Events -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card border-0">
+                    <div class="card-header bg-white border-0">
+                        <h6 class="textSecondary fw-bold mb-0">Most Popular Events</h6>
+                        <small class="textGray">Top performing events by bookings</small>
+                    </div>
+                    <div class="card-body">
+                        <div *ngIf="dashboardData.overview.mostPopularEvents.length === 0" class="text-center py-4">
+                            <i class="fas fa-star fs-1 textGray mb-3"></i>
+                            <p class="textGray">No popular events data available</p>
+                        </div>
+                        <div *ngIf="dashboardData.overview.mostPopularEvents.length > 0" class="row">
+                            <div *ngFor="let event of dashboardData.overview.mostPopularEvents"
+                                class="col-lg-4 col-md-6 mb-3">
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="card-title textSecondary mb-0">{{ event.eventDetails.name }}</h6>
+                                            <span class="badge bg-primary">{{ event.bookingCount | pluralize: 'booking'
+                                                }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <small class="textGray">
+                                                    <i class="fas fa-calendar me-1"></i>
+                                                    {{ event.eventDetails.date | date:'MMM dd, yyyy' }}
+                                                </small>
+                                                <br>
+                                                <small class="textGray">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    {{ event.eventDetails.venue }}
+                                                </small>
+                                            </div>
+                                            <div class="text-end">
+                                                <div class="fw-semibold text-success">₦{{ event.revenue | numberFormat
+                                                    }}</div>
+                                                <small class="textGray">Revenue</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

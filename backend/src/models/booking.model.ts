@@ -3,7 +3,6 @@ import { Document, Schema, model, Model } from "mongoose";
 export interface IBooking extends Document {
   user: Schema.Types.ObjectId;
   event: Schema.Types.ObjectId;
-  bookingDate: Date;
   totalAmount: number;
   paymentStatus: "paid" | "failed";
   createdAt?: Date;
@@ -21,10 +20,6 @@ const schema = new Schema<IBooking>(
       type: Schema.Types.ObjectId,
       ref: "event",
       required: [true, "Event is required"],
-    },
-    bookingDate: {
-      type: Date,
-      default: Date.now,
     },
     totalAmount: {
       type: Number,

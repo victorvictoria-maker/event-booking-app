@@ -359,7 +359,7 @@ export class AdminBookingsComponent implements OnInit {
         booking.event.status,
         booking.totalAmount,
         booking.paymentStatus,
-        new Date(booking.bookingDate).toLocaleDateString(),
+        new Date(booking.createdAt).toLocaleDateString(),
       ];
       csvRows.push(row.join(','));
     });

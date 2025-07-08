@@ -20,7 +20,7 @@ export interface Booking {
     organizer: string;
     status: string;
   };
-  bookingDate: Date;
+  // bookingDate: Date;
   totalAmount: number;
   paymentStatus: 'paid' | 'failed';
   createdAt: Date;

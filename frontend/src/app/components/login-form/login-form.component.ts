@@ -27,7 +27,7 @@ export class LoginFormComponent implements OnInit {
       if (isAdmin && currentUrl === '/admin/login') {
         this.router.navigateByUrl('/admin/dashboard');
       } else if (!isAdmin && currentUrl === '/login') {
-        this.router.navigateByUrl('/dashboard');
+        this.router.navigateByUrl('/events');
       }
     }
   }
@@ -85,7 +85,7 @@ export class LoginFormComponent implements OnInit {
           this.router.navigateByUrl(this.returnUrl);
         } else {
           const isAdmin = result.isAdmin;
-          this.router.navigateByUrl(isAdmin ? 'admin/dashboard' : 'dashboard');
+          this.router.navigateByUrl(isAdmin ? 'admin/dashboard' : 'events');
         }
       },
       error: (error) => {
