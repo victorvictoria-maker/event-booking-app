@@ -1,16 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AdminDashboardComponent } from './admin-dashboard.component';
+import { provideHttpClient } from '@angular/common/http';
+import { ToastrModule, ToastrService } from 'ngx-toastr';
 
 describe('AdminDashboardComponent', () => {
   let component: AdminDashboardComponent;
   let fixture: ComponentFixture<AdminDashboardComponent>;
+  let mockToastrService: jasmine.SpyObj<ToastrService>;
 
   beforeEach(async () => {
+    mockToastrService = jasmine.createSpyObj('ToastrService', [
+      'success',
+      'error',
+    ]);
+
     await TestBed.configureTestingModule({
-      imports: [AdminDashboardComponent]
-    })
-    .compileComponents();
+      imports: [AdminDashboardComponent, ToastrModule.forRoot()],
+      providers: [
+        provideHttpClient(),
+        { provide: ToastrService, useValue: mockToastrService },
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(AdminDashboardComponent);
     component = fixture.componentInstance;

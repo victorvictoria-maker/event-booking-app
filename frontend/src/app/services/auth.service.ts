@@ -100,6 +100,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem('event-booking-app-token');
     localStorage.removeItem('event-booking-is-admin');
+    localStorage.removeItem('event-booking-app-username');
     this.router.navigateByUrl('login');
   }
 
