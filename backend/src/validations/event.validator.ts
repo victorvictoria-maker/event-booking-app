@@ -1,8 +1,5 @@
 import * as joi from "joi";
-
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
-tomorrow.setHours(0, 0, 0, 0);
+import { CategoryI } from "../data/category.enum";
 
 const timeRangePattern =
   /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]\s*-\s*([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
@@ -14,26 +11,9 @@ class EventValidator {
     category: joi
       .string()
       .required()
-      .valid(
-        "conference",
-        "workshop",
-        "seminar",
-        "concert",
-        "festival",
-        "sports",
-        "exhibition",
-        "networking",
-        "webinar",
-        "party",
-        "charity",
-        "business",
-        "education",
-        "entertainment",
-        "other"
-      ),
-    // location: joi.string().required().min(3).max(200).trim(),
+      .valid(...Object.values(CategoryI)),
     venue: joi.string().required().min(3).max(200).trim(),
-    date: joi.date().required().min(tomorrow),
+    date: joi.date().required(),
     time: joi.string().required().pattern(timeRangePattern).messages({
       "string.pattern.base": 'Time must be in correct format "HH:MM - HH:MM"',
     }),
@@ -47,27 +27,10 @@ class EventValidator {
     description: joi.string().min(10).max(2000).trim().optional(),
     category: joi
       .string()
-      .valid(
-        "conference",
-        "workshop",
-        "seminar",
-        "concert",
-        "festival",
-        "sports",
-        "exhibition",
-        "networking",
-        "webinar",
-        "party",
-        "charity",
-        "business",
-        "education",
-        "entertainment",
-        "other"
-      )
+      .valid(...Object.values(CategoryI))
       .optional(),
-    // location: joi.string().min(3).max(200).trim().optional(),
     venue: joi.string().min(3).max(200).trim().optional(),
-    date: joi.date().min(tomorrow).optional(),
+    date: joi.date().optional(),
     time: joi.string().pattern(timeRangePattern).optional().messages({
       "string.pattern.base": 'Time must be in correct format "HH:MM - HH:MM"',
     }),

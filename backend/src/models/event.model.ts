@@ -1,10 +1,10 @@
 import { Document, Schema, model, Model } from "mongoose";
+import { CategoryI } from "../data/category.enum";
 
 export interface IEvent extends Document {
   name: string;
   description: string;
-  category: string;
-  // location: string;
+  category: CategoryI;
   venue: string;
   date: Date;
   time: string;
@@ -38,29 +38,8 @@ const schema = new Schema<IEvent>(
     category: {
       type: String,
       required: [true, "Event category is required"],
-      enum: [
-        "conference",
-        "workshop",
-        "seminar",
-        "concert",
-        "festival",
-        "sports",
-        "exhibition",
-        "networking",
-        "webinar",
-        "party",
-        "charity",
-        "business",
-        "education",
-        "entertainment",
-        "other",
-      ],
+      enum: Object.values(CategoryI),
     },
-    // location: {
-    //   type: String,
-    //   required: [true, "Event location is required"],
-    //   trim: true,
-    // },
     venue: {
       type: String,
       required: [true, "Event venue is required"],
@@ -69,12 +48,12 @@ const schema = new Schema<IEvent>(
     date: {
       type: Date,
       required: [true, "Event date is required"],
-      validate: {
-        validator: function (value: Date) {
-          return value > new Date();
-        },
-        message: "Event date must be in the future",
-      },
+      // validate: {
+      //   validator: function (value: Date) {
+      //     return value > new Date();
+      //   },
+      //   message: "Event date must be in the future",
+      // },
     },
     time: {
       type: String,
@@ -142,7 +121,6 @@ schema.pre("save", function (this: IEvent) {
 });
 
 schema.index({ category: 1 });
-// schema.index({ location: 1 });
 schema.index({ date: 1 });
 schema.index({ status: 1 });
 schema.index({ organizer: 1 });
