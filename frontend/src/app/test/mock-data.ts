@@ -22,7 +22,7 @@ export const mockEvent: Event = {
   name: 'Farming Festival',
   description: 'Test Description',
   date: '2025-07-01',
-  time: '12:00',
+  time: '10:00 - 12:00',
   totalSeats: 100,
   category: 'Music',
   venue: 'Abuja',
