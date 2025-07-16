@@ -1,11 +1,13 @@
+console.log("Starting server...");
 import express from "express";
 import path from "path";
 import cors from "cors";
-import helmet from "helmet";
 import errorHandler = require("errorhandler");
+import helmet from "helmet";
+import { morgan } from "./utilities/logger.util";
 import { dbConfig } from "./models/_config";
 import { routes } from "./routes/index.route";
-import { morgan } from "./utilities/logger.util";
+
 const port = process.env.PORT || 8082;
 
 const app = express();
@@ -41,3 +43,5 @@ routes(app);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+console.log("hi");

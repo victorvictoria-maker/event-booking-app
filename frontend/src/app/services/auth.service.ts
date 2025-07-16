@@ -13,6 +13,19 @@ export class AuthService {
   router = inject(Router);
   private api = environment.apiBaseUrl;
 
+  private storeAuthData(
+    token: string,
+    isAdmin: boolean,
+    username: string
+  ): void {
+    localStorage.setItem('event-booking-app-token', JSON.stringify(token));
+    localStorage.setItem('event-booking-is-admin', JSON.stringify(isAdmin));
+    localStorage.setItem(
+      'event-booking-app-username',
+      JSON.stringify(username)
+    );
+  }
+
   register(user: User): Observable<any> {
     const { username, email, password, isAdmin } = user;
     return this.http
@@ -25,16 +38,12 @@ export class AuthService {
       .pipe(
         map((res: any) => {
           if (res.status === 'CREATED' && res.data.token) {
-            localStorage.setItem(
-              'event-booking-app-token',
-              JSON.stringify(res.data.token)
+            this.storeAuthData(
+              res.data.token,
+              res.data.user.isAdmin,
+              res.data.user.username
             );
-            localStorage.setItem(
-              'event-booking-is-admin',
-              JSON.stringify(res.data.user.isAdmin)
-            );
-
-            console.log(res.data.user.isAdmin);
+            // console.log(res.data.user.isAdmin);
 
             return {
               success: true,
@@ -62,17 +71,17 @@ export class AuthService {
       .pipe(
         map((res: any) => {
           if (res.status === 'SUCCESS') {
-            console.log(res);
-            localStorage.setItem(
-              'event-booking-app-token',
-              JSON.stringify(res.data.token)
-            );
-            localStorage.setItem(
-              'event-booking-is-admin',
-              JSON.stringify(res.data.user.isAdmin)
+            this.storeAuthData(
+              res.data.token,
+              res.data.user.isAdmin,
+              res.data.user.username
             );
 
-            return { success: true, message: 'Login successful' };
+            return {
+              success: true,
+              message: 'Login successful',
+              isAdmin: res.data.user.isAdmin,
+            };
           } else if (res.status === 'ERROR') {
             throw new Error(res.message);
           } else {
@@ -92,5 +101,27 @@ export class AuthService {
     localStorage.removeItem('event-booking-app-token');
     localStorage.removeItem('event-booking-is-admin');
     this.router.navigateByUrl('login');
+  }
+
+  getToken(): string | null {
+    return JSON.parse(
+      localStorage.getItem('event-booking-app-token') || 'null'
+    );
+  }
+
+  isAdmin(): boolean {
+    return JSON.parse(
+      localStorage.getItem('event-booking-is-admin') || 'false'
+    );
+  }
+
+  getUsername(): string | null {
+    return JSON.parse(
+      localStorage.getItem('event-booking-app-username') || 'null'
+    );
+  }
+
+  isLoggedIn(): boolean {
+    return !!this.getToken();
   }
 }

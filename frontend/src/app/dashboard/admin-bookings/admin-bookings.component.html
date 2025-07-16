@@ -1,0 +1,382 @@
+<div class="container-fluid p-4">
+    <!-- Header Section -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="textSecondary fw-bold mb-1">Event Bookings</h2>
+            <p class="textGray mb-0">Manage bookings for your organized events</p>
+        </div>
+        <div class="d-flex align-items-center gap-3">
+            <span class="badge bg-primary fs-6">{{ bookingStats.totalBookings }} Total Bookings</span>
+            <span class="badge bg-success fs-6">{{ bookingStats.paidBookings }} Paid</span>
+            <span class="badge bg-info fs-6">{{ bookingStats.totalRevenue | currency:'₦':'symbol':'1.0-0' }}</span>
+            <button class="btn btn-outline-primary" (click)="onExportAllBookings()" [disabled]="isLoading()">
+                <i class="fas fa-download me-2"></i>
+                <span *ngIf="!isLoading()">Export All</span>
+                <span *ngIf="isLoading()">Exporting...</span>
+            </button>
+
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card border-0 bg-primary text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ bookingStats.totalBookings }}</h5>
+                            <small>Total Bookings</small>
+                        </div>
+                        <i class="fas fa-ticket-alt fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card border-0 bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ bookingStats.paidBookings }}</h5>
+                            <small>Paid Bookings</small>
+                        </div>
+                        <i class="fas fa-check-circle fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+            <div class="card border-0 bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ bookingStats.totalRevenue | currency:'₦':'symbol':'1.0-0' }}</h5>
+                            <small>Total Revenue</small>
+                        </div>
+                        <i class="fas fa-naira-sign fs-3"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="card border-0 mb-4">
+        <div class="card-body">
+            <div class="row align-items-end">
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <label class="form-label textSecondary fw-semibold smallFont">Search Bookings</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search by event name, user, venue..."
+                            [(ngModel)]="filters.searchTerm" (input)="onFiltersChange()" />
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-lg-2 col-md-3 mb-3">
+                    <label class="form-label textSecondary fw-semibold smallFont">Category</label>
+                    <select class="form-select" [(ngModel)]="filters.category" (change)="onFiltersChange()">
+                        <option value="">All Categories</option>
+                        <option *ngFor="let category of categories" [value]="category">
+                            {{ category | titlecase }}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-3 mb-3">
+                    <label class="form-label textSecondary fw-semibold smallFont">Event Status</label>
+                    <select class="form-select" [(ngModel)]="filters.eventStatus" (change)="onFiltersChange()">
+                        <option value="">All Events</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+
+                <div class="col-lg-2 col-md-3 mb-3">
+                    <button class="btn btn-outline-secondary w-100" (click)="onClearFilters()">
+                        <i class="fas fa-times me-1"></i> Clear Filters
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading()" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 textGray">Loading bookings...</p>
+    </div>
+
+    <!-- Bookings Table -->
+    <div *ngIf="!isLoading()" class="card border-0">
+        <div *ngIf="filteredBookings.length === 0" class="card-body text-center py-5">
+            <i class="fas fa-inbox fs-1 textGray mb-3"></i>
+            <h5 class="textGray">No Bookings Found</h5>
+            <p class="textGray">No bookings match your current filters or you haven't received any bookings yet.</p>
+        </div>
+
+        <div *ngIf="filteredBookings.length > 0" class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="border-0 textSecondary fw-semibold">Booking ID</th>
+                            <th class="border-0 textSecondary fw-semibold">User Details</th>
+                            <th class="border-0 textSecondary fw-semibold">Event Details</th>
+                            <th class="border-0 textSecondary fw-semibold">Date & Venue</th>
+                            <th class="border-0 textSecondary fw-semibold">Amount</th>
+                            <th class="border-0 textSecondary fw-semibold">Payment Status</th>
+                            <th class="border-0 textSecondary fw-semibold">Booking Date</th>
+                            <th class="border-0 textSecondary fw-semibold text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let booking of getCurrentPageBookings()" class="align-middle">
+                            <td>
+                                <div class="textSecondary fw-semibold smallFont font-monospace">
+                                    #{{ booking._id.slice(-8).toUpperCase() }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center"
+                                            style="width: 35px; height: 35px;">
+                                            <i class="fas fa-user"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="textSecondary fw-semibold smallFont">{{ booking.user.username }}
+                                        </div>
+                                        <div class="textGray smallFont">{{ booking.user.email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <h6 class="mb-1 textSecondary">{{ booking.event.name }}</h6>
+                                    <div class="d-flex gap-2">
+                                        <span class="badge bg-light text-dark">{{ booking.event.category | titlecase
+                                            }}</span>
+                                        <span [class]="getEventStatusBadgeClass(booking.event.status)">
+                                            {{ booking.event.status | titlecase }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <div class="textSecondary fw-semibold smallFont">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        {{ booking.event.date | date:'MMM dd, yyyy' }}
+                                    </div>
+                                    <div class="textSecondary fw-semibold smallFont">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ booking.event.time }}
+                                    </div>
+                                    <div class="textGray smallFont">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        {{ booking.event.venue }}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="textSecondary fw-semibold">
+                                    {{ booking.totalAmount | nairaFormat:booking.event.isFree }}
+                                </div>
+                            </td>
+                            <td>
+                                <span [class]="getPaymentStatusBadgeClass(booking.paymentStatus)">
+                                    {{ booking.paymentStatus | titlecase }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="textSecondary smallFont">
+                                    {{ booking.createdAt | date:'MMM dd, yyyy' }}
+                                </div>
+                                <div class="textGray smallFont">
+                                    {{ booking.createdAt | date:'HH:mm' }}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button"
+                                        [id]="'dropdownMenuButton' + booking._id" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu"
+                                        [attr.aria-labelledby]="'dropdownMenuButton' + booking._id">
+                                        <li>
+                                            <button class="dropdown-item" (click)="onViewBookingDetails(booking)">
+                                                <i class="fas fa-eye me-2"></i>View Details
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item" (click)="onContactUser(booking.user)">
+                                                <i class="fas fa-envelope me-2"></i>Contact User
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item" (click)="onExportBooking(booking)">
+                                                <i class="fas fa-download me-2"></i>Export Data
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!isLoading() && paginationData.totalPages > 1"
+        class="d-flex justify-content-between align-items-center mt-4">
+        <div class="text-muted">
+            Showing {{ ((paginationData.currentPage - 1) * paginationData.itemsPerPage) + 1 }}
+            to {{ Math.min(paginationData.currentPage * paginationData.itemsPerPage, paginationData.totalItems) }}
+            of {{ paginationData.totalItems }} entries
+        </div>
+
+        <nav aria-label="Admin bookings pagination">
+            <ul class="pagination mb-0">
+                <li class="page-item" [class.disabled]="!paginationData.hasPrevPage">
+                    <button class="page-link" (click)="onPreviousPage()" [disabled]="!paginationData.hasPrevPage">
+                        <i class="fas fa-chevron-left"></i>
+                        Previous
+                    </button>
+                </li>
+
+                <li class="page-item" *ngFor="let page of [].constructor(paginationData.totalPages); let i = index"
+                    [class.active]="i + 1 === paginationData.currentPage">
+                    <button class="page-link" (click)="onPageChange(i + 1)">{{ i + 1 }}</button>
+                </li>
+
+                <li class="page-item" [class.disabled]="!paginationData.hasNextPage">
+                    <button class="page-link" (click)="onNextPage()" [disabled]="!paginationData.hasNextPage">
+                        Next
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Booking Details Modal -->
+<div class="modal fade" id="bookingDetailsModal" tabindex="-1" aria-labelledby="bookingDetailsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" *ngIf="selectedBooking">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookingDetailsModalLabel">
+                    Booking Details - #{{ selectedBooking._id.slice(-8).toUpperCase() }}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- User Information -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="textSecondary fw-bold mb-3">User Information</h6>
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                style="width: 50px; height: 50px;">
+                                <i class="fas fa-user fs-4"></i>
+                            </div>
+                            <div>
+                                <div class="fw-semibold">{{ selectedBooking.user.username }}</div>
+                                <div class="textGray smallFont">{{ selectedBooking.user.email }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Booking Information -->
+                    <div class="col-md-6 mb-4">
+                        <h6 class="textSecondary fw-bold mb-3">Booking Information</h6>
+                        <div class="mb-2">
+                            <strong>Booking ID:</strong>
+                            <span class="font-monospace">#{{ selectedBooking._id.slice(-8).toUpperCase() }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <strong>Booking Date:</strong>
+                            {{ selectedBooking.createdAt | date:'MMM dd, yyyy HH:mm' }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Payment Status:</strong>
+                            <span [class]="getPaymentStatusBadgeClass(selectedBooking.paymentStatus)" class="ms-2">
+                                {{ selectedBooking.paymentStatus | titlecase }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Event Information -->
+                    <div class="col-12 mb-4">
+                        <h6 class="textSecondary fw-bold mb-3">Event Information</h6>
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ selectedBooking.event.name }}</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <i class="fas fa-calendar me-2"></i>
+                                            <strong>Date:</strong> {{ selectedBooking.event.date | date:'MMM dd, yyyy'
+                                            }}
+                                        </div>
+                                        <div class="mb-2">
+                                            <i class="fas fa-clock me-2"></i>
+                                            <strong>Time:</strong> {{ selectedBooking.event.time }}
+                                        </div>
+                                        <div class="mb-2">
+                                            <i class="fas fa-map-marker-alt me-2"></i>
+                                            <strong>Venue:</strong> {{ selectedBooking.event.venue }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-2">
+                                            <i class="fas fa-tag me-2"></i>
+                                            <strong>Category:</strong> {{ selectedBooking.event.category | titlecase }}
+                                        </div>
+                                        <div class="mb-2">
+                                            <i class="fas fa-naira-sign me-2"></i>
+                                            <strong>Price:</strong> {{ selectedBooking.totalAmount |
+                                            nairaFormat:selectedBooking.event.isFree }}
+
+                                        </div>
+                                        <div class="mb-2">
+                                            <i class="fas fa-info-circle me-2"></i>
+                                            <strong>Status:</strong>
+                                            <span [class]="getEventStatusBadgeClass(selectedBooking.event.status)"
+                                                class="ms-2">
+                                                {{ selectedBooking.event.status | titlecase }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" (click)="onContactUser(selectedBooking.user)">
+                    <i class="fas fa-envelope me-2"></i>Contact User
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
