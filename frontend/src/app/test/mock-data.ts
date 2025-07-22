@@ -6,7 +6,7 @@ import {
   TopUser,
   UserDashboardData,
 } from '../models/dashboard.model';
-import { Event, EventFilters } from '../models/event.model';
+import { Event, EventFilters, PaginationData } from '../models/event.model';
 
 export const mockUser: User = {
   username: 'vicky',
@@ -33,6 +33,42 @@ export const mockEvent: Event = {
   status: 'active',
 };
 
+export const mockEvent2: Event = {
+  id: '2',
+  _id: '2',
+  name: 'Tech Conference',
+  description: 'Technology conference description',
+  date: '2025-08-15',
+  time: '09:00 - 17:00',
+  totalSeats: 200,
+  category: 'Technology',
+  venue: 'Lagos',
+  isFree: true,
+  price: 0,
+  availableSeats: 150,
+  bookedSeats: 50,
+  status: 'active',
+};
+
+export const mockEvent3: Event = {
+  id: '3',
+  _id: '3',
+  name: 'Art Exhibition',
+  description: 'Beautiful art exhibition',
+  date: '2025-09-10',
+  time: '11:00 - 18:00',
+  totalSeats: 75,
+  category: 'Art',
+  venue: 'Port Harcourt',
+  isFree: false,
+  price: 25,
+  availableSeats: 0,
+  bookedSeats: 75,
+  status: 'active',
+};
+
+export const mockEvents: Event[] = [mockEvent, mockEvent2, mockEvent3];
+
 export const mockEventFilters: EventFilters = {
   searchTerm: 'music',
   category: 'Music',
@@ -41,7 +77,8 @@ export const mockEventFilters: EventFilters = {
 };
 
 export const mockBooking = {
-  _id: 'gh56781',
+  _id: 'booking1',
+  eventId: '1',
   user: {
     _id: '23456fghnm',
     username: 'vicky',
@@ -54,6 +91,7 @@ export const mockBooking = {
     venue: 'Abuja',
     price: 50,
     isFree: false,
+    category: 'networking',
     totalSeats: 100,
     bookedSeats: 20,
     availableSeats: 80,
@@ -61,7 +99,62 @@ export const mockBooking = {
   totalAmount: 50,
   paymentStatus: 'paid',
   createdAt: '2025-07-01T00:00:00.000Z',
+  updatedAt: '2025-07-01T00:00:00.000Z',
 };
+
+export const mockBooking2 = {
+  _id: 'booking2',
+  eventId: '2',
+  user: {
+    _id: '23456fghnm',
+    username: 'vicky',
+    email: 'vee@gmail.com',
+  },
+  event: {
+    _id: '2',
+    name: 'Tech Conference',
+    date: '2025-08-15',
+    venue: 'Lagos',
+    price: 0,
+    isFree: true,
+    category: 'technology',
+    totalSeats: 200,
+    bookedSeats: 50,
+    availableSeats: 150,
+  },
+  totalAmount: 0,
+  paymentStatus: 'paid',
+  createdAt: '2025-07-02T00:00:00.000Z',
+  updatedAt: '2025-07-02T00:00:00.000Z',
+};
+
+export const mockBooking3 = {
+  _id: 'booking3',
+  eventId: '4',
+  user: {
+    _id: '23456fghnm',
+    username: 'vicky',
+    email: 'vee@gmail.com',
+  },
+  event: {
+    _id: '4',
+    name: 'Music Concert',
+    date: '2025-09-01',
+    venue: 'Kano',
+    price: 75,
+    isFree: false,
+    category: 'music',
+    totalSeats: 150,
+    bookedSeats: 30,
+    availableSeats: 120,
+  },
+  totalAmount: 75,
+  paymentStatus: 'paid',
+  createdAt: '2025-07-03T00:00:00.000Z',
+  updatedAt: '2025-07-03T00:00:00.000Z',
+};
+
+export const mockBookings = [mockBooking, mockBooking2, mockBooking3];
 
 export const mockBookingStats = {
   totalBookings: 5,
@@ -238,3 +331,192 @@ export const mockTopUsers: TopUser[] = [
     },
   },
 ];
+
+export const mockPaginationData: PaginationData = {
+  currentPage: 3,
+  totalPages: 10,
+  totalItems: 100,
+  itemsPerPage: 10,
+  hasNextPage: true,
+  hasPrevPage: true,
+};
+
+export const mockEventsResponse = {
+  data: {
+    events: mockEvents,
+    pagination: mockPaginationData,
+  },
+};
+
+export const mockBookingsResponse = {
+  data: {
+    bookings: mockBookings,
+  },
+};
+
+export const mockEmptyEventsResponse = {
+  data: {
+    events: [],
+    pagination: null,
+  },
+};
+
+export const mockEmptyBookingsResponse = {
+  data: {
+    bookings: [],
+  },
+};
+
+export const mockCreateBookingResponse = {
+  success: true,
+  message: 'Booking created successfully',
+  data: {
+    booking: mockBooking,
+  },
+};
+
+export const mockCancelBookingResponse = {
+  success: true,
+  message: 'Booking cancelled successfully',
+};
+
+export const mockEventStats = {
+  data: {
+    totalEvents: 10,
+    activeEvents: 8,
+    totalBookings: 25,
+    totalAvailableSeats: 150,
+  },
+};
+
+export const mockCreateEventResponse = {
+  success: true,
+  message: 'Event created successfully',
+  data: { event: mockEvent },
+};
+
+export const mockUpdateEventResponse = {
+  success: true,
+  message: 'Event updated successfully',
+  data: { event: mockEvent },
+};
+
+export const mockDeleteEventResponse = {
+  success: true,
+  message: 'Event deleted successfully',
+};
+
+export const mockToggleStatusResponse = {
+  success: true,
+  message: 'Event status updated successfully',
+  data: { event: { ...mockEvent, status: 'cancelled' } },
+};
+
+export const mockAdminBookingFilters = {
+  searchTerm: 'music',
+  category: 'Music',
+  eventStatus: 'active',
+};
+
+export const mockAdminBookingStats = {
+  totalBookings: 3,
+  paidBookings: 3,
+  totalRevenue: 175,
+};
+
+export const mockBookingsPaginationResponse = {
+  data: {
+    bookings: mockBookings,
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+      totalItems: 3,
+      itemsPerPage: 10,
+      hasNextPage: false,
+      hasPrevPage: false,
+    },
+  },
+};
+
+export const mockEmptyBookingsPaginationResponse = {
+  data: {
+    bookings: [],
+    pagination: {
+      currentPage: 1,
+      totalPages: 0,
+      totalItems: 0,
+      itemsPerPage: 10,
+      hasNextPage: false,
+      hasPrevPage: false,
+    },
+  },
+};
+
+export const mockLargeBookingsResponse = {
+  data: {
+    bookings: [
+      ...mockBookings,
+      {
+        _id: 'booking4',
+        eventId: '3',
+        user: {
+          _id: '23456fghnm',
+          username: 'alice',
+          email: 'alice@gmail.com',
+        },
+        event: {
+          _id: '3',
+          name: 'Art Exhibition',
+          date: '2025-09-10',
+          time: '11:00 - 18:00',
+          venue: 'Port Harcourt',
+          price: 25,
+          isFree: false,
+          totalSeats: 75,
+          bookedSeats: 75,
+          availableSeats: 0,
+          category: 'Art',
+          status: 'active',
+        },
+        totalAmount: 25,
+        paymentStatus: 'paid',
+        createdAt: '2025-07-04T00:00:00.000Z',
+      },
+      {
+        _id: 'booking5',
+        eventId: '1',
+        user: {
+          _id: '789xyz',
+          username: 'bob',
+          email: 'bob@gmail.com',
+        },
+        event: {
+          _id: '1',
+          name: 'Farming Festival',
+          date: '2025-07-01',
+          time: '10:00 - 12:00',
+          venue: 'Abuja',
+          price: 50,
+          isFree: false,
+          totalSeats: 100,
+          bookedSeats: 20,
+          availableSeats: 80,
+          category: 'Music',
+          status: 'cancelled',
+        },
+        totalAmount: 50,
+        paymentStatus: 'pending',
+        createdAt: '2025-07-05T00:00:00.000Z',
+        updatedAt: '2025-07-05T00:00:00.000Z',
+      },
+    ],
+    pagination: {
+      currentPage: 1,
+      totalPages: 1,
+      totalItems: 5,
+      itemsPerPage: 1000,
+      hasNextPage: false,
+      hasPrevPage: false,
+    },
+  },
+};

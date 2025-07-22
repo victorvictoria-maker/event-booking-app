@@ -271,7 +271,7 @@ export class AdminDashboardComponent implements OnInit {
     this.loadBookingAnalytics();
   }
 
-  private setupRevenueChart() {
+  public setupRevenueChart() {
     if (!this.revenueStatsData) return;
 
     interface RevenueStat {
@@ -308,7 +308,7 @@ export class AdminDashboardComponent implements OnInit {
     };
   }
 
-  private setupEventStatusChart() {
+  public setupEventStatusChart() {
     if (!this.dashboardData) return;
 
     const statusData = this.dashboardData.eventStatusDistribution;
@@ -338,7 +338,7 @@ export class AdminDashboardComponent implements OnInit {
     };
   }
 
-  private setupBookingTrendsChart() {
+  public setupBookingTrendsChart() {
     if (!this.dashboardData) return;
 
     const monthlyData = this.dashboardData.monthlyRevenue;
@@ -373,7 +373,7 @@ export class AdminDashboardComponent implements OnInit {
     };
   }
 
-  private setupBookingsByDayChart() {
+  public setupBookingsByDayChart() {
     if (!this.bookingAnalyticsData) return;
 
     const daysOfWeek = [

@@ -15,7 +15,6 @@ import { FormatNumber } from '../../utils/formatNumber';
 import { EventPaginationComponent } from '../event-pagination/event-pagination.component';
 import categories from '../../data/eventCategories';
 import { ToastrService } from 'ngx-toastr';
-import { BookingService } from '../../services/booking.service';
 
 @Component({
   selector: 'app-admin-event-management',
@@ -35,7 +34,6 @@ export class AdminEventManagementComponent implements OnInit {
   isLoading = signal(false);
 
   private eventService = inject(EventService);
-  private bookingService = inject(BookingService);
   public modalService = inject(NgbModal);
   private toastr = inject(ToastrService);
 

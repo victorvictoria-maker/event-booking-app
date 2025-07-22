@@ -18,16 +18,6 @@ export class EventService {
   private api = environment.apiBaseUrl;
   auth = inject(AuthService);
 
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.auth.getToken();
-    // console.log('Token:', this.auth.getToken());
-
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    });
-  }
-
   getAllEvents(
     filters?: EventFilters,
     page: number = 1,
@@ -54,7 +44,7 @@ export class EventService {
 
     return this.http
       .get(`${this.api}/event`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
         params,
       })
       .pipe(
@@ -77,7 +67,7 @@ export class EventService {
   getEventById(eventId: string): Observable<any> {
     return this.http
       .get(`${this.api}/event/${eventId}`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {
@@ -109,7 +99,7 @@ export class EventService {
 
     return this.http
       .post(`${this.api}/event/create`, data, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {
@@ -146,7 +136,7 @@ export class EventService {
 
     return this.http
       .put(`${this.api}/event/${eventId}`, data, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {
@@ -169,7 +159,7 @@ export class EventService {
   deleteEvent(eventId: string): Observable<any> {
     return this.http
       .delete(`${this.api}/event/${eventId}`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {
@@ -194,7 +184,7 @@ export class EventService {
         `${this.api}/event/${eventId}/toggle-status`,
         {},
         {
-          headers: this.getAuthHeaders(),
+          headers: this.auth.getAuthHeaders(),
         }
       )
       .pipe(
@@ -218,7 +208,7 @@ export class EventService {
   getEventStats(): Observable<any> {
     return this.http
       .get(`${this.api}/event/stats`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {

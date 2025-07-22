@@ -159,7 +159,7 @@ export class UserEventManagementComponent {
     }
   }
 
-  private createBooking(event: Event) {
+  public createBooking(event: Event) {
     if (!this.eventUtils.isEventBookable(event)) {
       this.toastr.error('This event is not available for booking.');
       return;
@@ -182,7 +182,7 @@ export class UserEventManagementComponent {
     });
   }
 
-  private cancelBooking(bookingId: string, event: Event) {
+  public cancelBooking(bookingId: string, event: Event) {
     this.setBookingLoading(event._id, true);
 
     this.bookingService.cancelBooking(bookingId).subscribe({
@@ -195,7 +195,7 @@ export class UserEventManagementComponent {
       },
       error: (error) => {
         this.setBookingLoading(event._id, false);
-        this.toastr.success('Failed to cancel booking:', error.message);
+        this.toastr.error('Failed to cancel booking:', error.message);
       },
     });
   }
@@ -208,7 +208,7 @@ export class UserEventManagementComponent {
     });
   }
 
-  private getUserBookingForEvent(eventId: string): any {
+  public getUserBookingForEvent(eventId: string): any {
     return this.userBookings.find(
       (booking) => booking.eventId === eventId || booking.event?._id === eventId
     );

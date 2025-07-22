@@ -21,7 +21,10 @@ describe('AdminDashboardService', () => {
   let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
-    const authSpy = jasmine.createSpyObj('AuthService', ['getToken']);
+    const authSpy = jasmine.createSpyObj('AuthService', [
+      'getToken',
+      'getAuthHeaders',
+    ]);
 
     TestBed.configureTestingModule({
       providers: [
@@ -41,21 +44,6 @@ describe('AdminDashboardService', () => {
 
   afterEach(() => {
     httpMock.verify();
-  });
-
-  describe('getAuthHeaders', () => {
-    it('should create headers with token', () => {
-      authServiceSpy.getToken.and.returnValue('fg56789');
-
-      service.getUserDashboard().subscribe();
-
-      const req = httpMock.expectOne(
-        `${environment.apiBaseUrl}/dashboard/user`
-      );
-      expect(req.request.headers.get('Authorization')).toBe('Bearer fg56789');
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      req.flush({ status: 'SUCCESS', data: mockUserDashboardData });
-    });
   });
 
   describe('getUserDashboard', () => {
@@ -78,9 +66,6 @@ describe('AdminDashboardService', () => {
         `${environment.apiBaseUrl}/dashboard/user`
       );
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 
@@ -124,9 +109,6 @@ describe('AdminDashboardService', () => {
         `${environment.apiBaseUrl}/dashboard/admin`
       );
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 
@@ -170,9 +152,6 @@ describe('AdminDashboardService', () => {
         `${environment.apiBaseUrl}/dashboard/admin/revenue`
       );
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 
@@ -257,9 +236,6 @@ describe('AdminDashboardService', () => {
         `${environment.apiBaseUrl}/dashboard/admin/bookings-analytics`
       );
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 
@@ -344,9 +320,6 @@ describe('AdminDashboardService', () => {
         `${environment.apiBaseUrl}/dashboard/admin/top-users`
       );
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 

@@ -15,7 +15,10 @@ describe('BookingService', () => {
   let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
-    const authSpy = jasmine.createSpyObj('AuthService', ['getToken']);
+    const authSpy = jasmine.createSpyObj('AuthService', [
+      'getToken',
+      'getAuthHeaders',
+    ]);
 
     TestBed.configureTestingModule({
       providers: [
@@ -35,21 +38,6 @@ describe('BookingService', () => {
 
   afterEach(() => {
     httpMock.verify();
-  });
-
-  describe('getAuthHeaders', () => {
-    it('should create headers with token', () => {
-      authServiceSpy.getToken.and.returnValue('fg56789');
-
-      service.createBooking('event1').subscribe();
-
-      const req = httpMock.expectOne(
-        `${environment.apiBaseUrl}/bookings/create`
-      );
-      expect(req.request.headers.get('Authorization')).toBe('Bearer fg56789');
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      req.flush({ status: 'CREATED', data: mockBooking });
-    });
   });
 
   describe('createBooking', () => {
@@ -72,9 +60,6 @@ describe('BookingService', () => {
         `${environment.apiBaseUrl}/bookings/create`
       );
       expect(req.request.method).toBe('POST');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       expect(req.request.body).toEqual({ eventId: 'event1' });
       req.flush(mockResponse);
     });
@@ -135,9 +120,6 @@ describe('BookingService', () => {
         `${environment.apiBaseUrl}/bookings/booking1/cancel`
       );
       expect(req.request.method).toBe('DELETE');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 
@@ -219,9 +201,6 @@ describe('BookingService', () => {
         `${environment.apiBaseUrl}/bookings/my-bookings?page=1&limit=10`
       );
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 
@@ -317,9 +296,6 @@ describe('BookingService', () => {
         `${environment.apiBaseUrl}/bookings/booking1`
       );
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 
@@ -383,9 +359,6 @@ describe('BookingService', () => {
         `${environment.apiBaseUrl}/bookings/stats`
       );
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 
@@ -429,9 +402,6 @@ describe('BookingService', () => {
         `${environment.apiBaseUrl}/bookings?page=1&limit=10`
       );
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 

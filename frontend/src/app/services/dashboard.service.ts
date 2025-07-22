@@ -26,18 +26,10 @@ export class AdminDashboardService {
   private api = environment.apiBaseUrl;
   auth = inject(AuthService);
 
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.auth.getToken();
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    });
-  }
-
   getUserDashboard(): Observable<any> {
     return this.http
       .get(`${this.api}/dashboard/user`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {
@@ -58,7 +50,7 @@ export class AdminDashboardService {
   getAdminDashboard(): Observable<any> {
     return this.http
       .get(`${this.api}/dashboard/admin`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {
@@ -90,7 +82,7 @@ export class AdminDashboardService {
 
     return this.http
       .get(`${this.api}/dashboard/admin/revenue`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
         params: httpParams,
       })
       .pipe(
@@ -126,7 +118,7 @@ export class AdminDashboardService {
 
     return this.http
       .get(`${this.api}/dashboard/admin/bookings-analytics`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
         params: httpParams,
       })
       .pipe(
@@ -149,7 +141,7 @@ export class AdminDashboardService {
   getAdminTopUsersByBookings(): Observable<any> {
     return this.http
       .get(`${this.api}/dashboard/admin/top-users`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {

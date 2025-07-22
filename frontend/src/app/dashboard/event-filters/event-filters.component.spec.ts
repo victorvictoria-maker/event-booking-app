@@ -64,13 +64,6 @@ describe('EventFiltersComponent', () => {
 
       expect(component.filters).toEqual(customFilters);
     });
-
-    // it('should accept showStatusFilter input', () => {
-    //   component.showStatusFilter = false;
-    //   fixture.detectChanges();
-
-    //   expect(component.showStatusFilter).toBe(false);
-    // });
   });
 
   describe('Clear Filters', () => {

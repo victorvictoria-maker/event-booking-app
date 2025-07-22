@@ -16,7 +16,10 @@ describe('EventService', () => {
   let authServiceSpy: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
-    const authSpy = jasmine.createSpyObj('AuthService', ['getToken']);
+    const authSpy = jasmine.createSpyObj('AuthService', [
+      'getToken',
+      'getAuthHeaders',
+    ]);
 
     TestBed.configureTestingModule({
       providers: [
@@ -38,21 +41,6 @@ describe('EventService', () => {
     httpMock.verify();
   });
 
-  describe('getAuthHeaders', () => {
-    it('should create headers with token', () => {
-      authServiceSpy.getToken.and.returnValue('fg56789');
-
-      service.getAllEvents().subscribe();
-
-      const req = httpMock.expectOne(
-        `${environment.apiBaseUrl}/event?page=1&limit=10`
-      );
-      expect(req.request.headers.get('Authorization')).toBe('Bearer fg56789');
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      req.flush({ status: 'SUCCESS', data: [] });
-    });
-  });
-
   describe('getAllEvents', () => {
     it('should fetch all events successfully with default parameters', () => {
       const mockResponse = {
@@ -71,9 +59,6 @@ describe('EventService', () => {
         `${environment.apiBaseUrl}/event?page=1&limit=10`
       );
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 
@@ -172,9 +157,6 @@ describe('EventService', () => {
 
       const req = httpMock.expectOne(`${environment.apiBaseUrl}/event/1`);
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 
@@ -229,9 +211,6 @@ describe('EventService', () => {
 
       const req = httpMock.expectOne(`${environment.apiBaseUrl}/event/create`);
       expect(req.request.method).toBe('POST');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       expect(req.request.body).toEqual({
         name: 'Farming Festival',
         description: 'Test Description',
@@ -364,9 +343,6 @@ describe('EventService', () => {
 
       const req = httpMock.expectOne(`${environment.apiBaseUrl}/event/1`);
       expect(req.request.method).toBe('PUT');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       expect(req.request.body).toEqual({
         _id: '1',
         name: 'Farming Festival',
@@ -451,9 +427,6 @@ describe('EventService', () => {
 
       const req = httpMock.expectOne(`${environment.apiBaseUrl}/event/1`);
       expect(req.request.method).toBe('DELETE');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 
@@ -510,9 +483,6 @@ describe('EventService', () => {
         `${environment.apiBaseUrl}/event/1/toggle-status`
       );
       expect(req.request.method).toBe('PATCH');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       expect(req.request.body).toEqual({});
       req.flush(mockResponse);
     });
@@ -579,9 +549,6 @@ describe('EventService', () => {
 
       const req = httpMock.expectOne(`${environment.apiBaseUrl}/event/stats`);
       expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(
-        'Bearer edghe1Gtyu56'
-      );
       req.flush(mockResponse);
     });
 

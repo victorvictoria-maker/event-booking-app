@@ -68,6 +68,35 @@ describe('AuthService', () => {
     });
   });
 
+  describe('getAuthHeaders', () => {
+    it('should create headers with token when token exists', () => {
+      const mockToken = 'fg56789';
+      spyOn(service, 'getToken').and.returnValue(mockToken);
+
+      const headers = service.getAuthHeaders();
+
+      expect(headers.get('Authorization')).toBe(`Bearer ${mockToken}`);
+      expect(headers.get('Content-Type')).toBe('application/json');
+    });
+
+    it('should create headers with null token when no token exists', () => {
+      spyOn(service, 'getToken').and.returnValue(null);
+
+      const headers = service.getAuthHeaders();
+
+      expect(headers.get('Authorization')).toBe('Bearer null');
+      expect(headers.get('Content-Type')).toBe('application/json');
+    });
+
+    it('should create headers with proper content type', () => {
+      spyOn(service, 'getToken').and.returnValue('fg56789');
+
+      const headers = service.getAuthHeaders();
+
+      expect(headers.get('Content-Type')).toBe('application/json');
+    });
+  });
+
   describe('register', () => {
     it('should register user successfully and store auth data', () => {
       const mockResponse = {

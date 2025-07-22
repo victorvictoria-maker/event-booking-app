@@ -2,7 +2,6 @@ import { inject, Injectable } from '@angular/core';
 import {
   HttpClient,
   HttpErrorResponse,
-  HttpHeaders,
   HttpParams,
 } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
@@ -17,20 +16,12 @@ export class BookingService {
   private api = environment.apiBaseUrl;
   auth = inject(AuthService);
 
-  private getAuthHeaders(): HttpHeaders {
-    const token = this.auth.getToken();
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    });
-  }
-
   createBooking(eventId: string): Observable<any> {
     const data = { eventId };
 
     return this.http
       .post(`${this.api}/bookings/create`, data, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {
@@ -51,7 +42,7 @@ export class BookingService {
   cancelBooking(bookingId: string): Observable<any> {
     return this.http
       .delete(`${this.api}/bookings/${bookingId}/cancel`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {
@@ -94,7 +85,7 @@ export class BookingService {
 
     return this.http
       .get(`${this.api}/bookings/my-bookings`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
         params,
       })
       .pipe(
@@ -116,7 +107,7 @@ export class BookingService {
   getBookingById(bookingId: string): Observable<any> {
     return this.http
       .get(`${this.api}/bookings/${bookingId}`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {
@@ -137,7 +128,7 @@ export class BookingService {
   getBookingStats(): Observable<any> {
     return this.http
       .get(`${this.api}/bookings/stats`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
       })
       .pipe(
         map((res: any) => {
@@ -162,7 +153,7 @@ export class BookingService {
 
     return this.http
       .get(`${this.api}/bookings`, {
-        headers: this.getAuthHeaders(),
+        headers: this.auth.getAuthHeaders(),
         params,
       })
       .pipe(

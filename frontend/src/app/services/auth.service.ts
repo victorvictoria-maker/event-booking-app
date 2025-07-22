@@ -1,6 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { User } from '../models/auth.model';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+} from '@angular/common/http';
 import { Router } from '@angular/router';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -24,6 +28,14 @@ export class AuthService {
       'event-booking-app-username',
       JSON.stringify(username)
     );
+  }
+
+  getAuthHeaders(): HttpHeaders {
+    const token = this.getToken();
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    });
   }
 
   register(user: User): Observable<any> {
