@@ -242,7 +242,6 @@ export class UserBookingsComponent implements OnInit {
     const endIndex = startIndex + pagination.itemsPerPage;
 
     if (currentTab === 'upcoming') {
-      // console.log('Fetching upcoming bookings', this.filteredUpcomingBookings);
       return this.filteredUpcomingBookings.slice(startIndex, endIndex);
     } else {
       return this.filteredCompletedBookings.slice(startIndex, endIndex);

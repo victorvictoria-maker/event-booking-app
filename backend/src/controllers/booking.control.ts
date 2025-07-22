@@ -54,17 +54,18 @@ class BookingController extends RootController {
 
       const savedBooking = await booking.save({ session });
 
-      await session.commitTransaction();
-
       const bookingResponse = await BookingModel.findById(savedBooking._id)
+        .session(session)
         .populate("user", "username email")
         .populate("event", "name date venue price isFree totalSeats");
 
       if (bookingResponse) {
         const eventBookedSeats = await BookingModel.countDocuments({
           event: eventId,
-        });
+        }).session(session);
         const eventAvailableSeats = event.totalSeats - eventBookedSeats;
+
+        await session.commitTransaction();
 
         const response = bookingResponse.toJSON();
         if (response.event) {
@@ -173,11 +174,6 @@ class BookingController extends RootController {
       const page = parseInt(queryParams.page) || 1;
       const limit = parseInt(queryParams.limit) || 10;
       const skip = (page - 1) * limit;
-
-      // const organizerEvents = await EventModel.find({
-      //   organizer: organizerId,
-      // }).select("_id");
-      // const eventIds = organizerEvents.map((event) => event._id);
 
       const searchCriteria: any = {};
 

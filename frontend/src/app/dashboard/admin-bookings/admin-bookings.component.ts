@@ -60,9 +60,6 @@ export class AdminBookingsComponent implements OnInit {
 
   ngOnInit() {
     this.loadAllBookings();
-    // console.log(this.allBookings, 'allBookings');
-    // console.log(this.filteredBookings, 'filteredBookings');
-    // console.log(this.selectedBooking, 'selectedBooking');
   }
 
   loadAllBookings() {
@@ -76,8 +73,6 @@ export class AdminBookingsComponent implements OnInit {
       .subscribe({
         next: (response) => {
           this.filteredBookings = response.data?.bookings || [];
-
-          // console.log(response.data?.bookings);
 
           if (response.data?.pagination) {
             this.paginationData = {
@@ -104,10 +99,7 @@ export class AdminBookingsComponent implements OnInit {
     this.bookingService.getAllBookings(1, 1000).subscribe({
       next: (response) => {
         this.allBookings = response.data?.bookings || [];
-        // console.log(this.allBookings, 'allBookings');
-        // console.log(this.filteredBookings, 'filteredBookings');
         this.calculateStats();
-        // console.log('Viewing all bookings stats:', this.allBookings);
       },
       error: (error) => {
         console.error('Failed to load booking stats:', error);
