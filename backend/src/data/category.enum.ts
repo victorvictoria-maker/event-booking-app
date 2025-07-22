@@ -1,0 +1,17 @@
+export enum CategoryI {
+  conference = "conference",
+  workshop = "workshop",
+  seminar = "seminar",
+  concert = "concert",
+  festival = "festival",
+  sports = "sports",
+  exhibition = "exhibition",
+  networking = "networking",
+  webinar = "webinar",
+  party = "party",
+  charity = "charity",
+  business = "business",
+  education = "education",
+  entertainment = "entertainment",
+  other = "other",
+}

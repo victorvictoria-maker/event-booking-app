@@ -1,0 +1,23 @@
+<div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="textSecondary fw-bold mb-1">Available Events</h2>
+            <p class="textGray mb-0">Discover and book amazing events</p>
+        </div>
+        <div class="d-flex align-items-center">
+            <span class="badge bg-primary fs-6">{{ paginationData.totalItems }} Events Available</span>
+        </div>
+    </div>
+
+    <app-event-filters [filters]="filters" [categories]="categories" [showPriceFilter]="true" [showStatusFilter]="false"
+        (filtersChange)="onFiltersChange($event)" (clearFilters)="onClearFilters()"></app-event-filters>
+
+
+    <app-event-table [events]="filteredEvents" [mode]="'user'" [isLoading]="isLoading()"
+        (viewEvent)="onViewEvent($event)" [totalEvents]="paginationData.totalItems"></app-event-table>
+
+
+    <app-event-pagination [paginationData]="paginationData" ariaLabel="Available events pagination"
+        (pageChange)="onPageChange($event)" (previousPage)="onPreviousPage()" (nextPage)="onNextPage()">
+    </app-event-pagination>
+</div>

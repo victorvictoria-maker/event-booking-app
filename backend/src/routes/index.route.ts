@@ -3,6 +3,7 @@ import chalk = require("chalk");
 import env from "../env";
 
 import authRoute from "./auth.route";
+import eventRoute from "./event.route";
 /**
  * Create and return Router.
  *
@@ -16,7 +17,7 @@ export const routes = (app: express.Application) => {
 
   console.log(chalk.yellow.bgBlack.bold("Loading sample routes"));
   authRoute.loadRoutes("/api/auth", router);
-  // eventRoute.loadRoutes("/api/event", router);
+  eventRoute.loadRoutes("/api/event", router);
 
   app.use(router);
 

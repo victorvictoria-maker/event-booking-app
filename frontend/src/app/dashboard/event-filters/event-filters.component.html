@@ -1,0 +1,47 @@
+<div class="card border-0 mb-4">
+    <div class="card-body">
+        <div class="row align-items-end">
+            <div class="col-md-4 mb-3">
+                <label class="form-label textSecondary fw-semibold smallFont">Search Events</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search by name, venue, category..."
+                        [(ngModel)]="filters.searchTerm" (input)="onSearchChange()" />
+                    <button class="btn btn-outline-secondary" type="button">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-md-2 mb-3">
+                <label class="form-label textSecondary fw-semibold smallFont">Category</label>
+                <select class="form-select" [(ngModel)]="filters.category" (change)="onCategoryChange()">
+                    <option value="">All Categories</option>
+                    <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 mb-3" *ngIf="showStatusFilter">
+                <label class="form-label textSecondary fw-semibold smallFont">Status</label>
+                <select class="form-select" [(ngModel)]="filters.status" (change)="onStatusChange()">
+                    <option value="">All Status</option>
+                    <option *ngFor="let status of statuses" [value]="status">{{ status | titlecase }}</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 mb-3" *ngIf="showPriceFilter">
+                <label class="form-label textSecondary fw-semibold smallFont">Price</label>
+                <select class="form-select" [(ngModel)]="filters.priceFilter" (change)="onPriceFilterChange()">
+                    <option value="">All Events</option>
+                    <option value="free">Free Events</option>
+                    <option value="paid">Paid Events</option>
+                </select>
+            </div>
+
+            <div class="col-md-2 mb-3">
+                <button class="btn btn-outline-secondary w-100" (click)="onClearFilters()">
+                    <i class="fas fa-times me-1"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
