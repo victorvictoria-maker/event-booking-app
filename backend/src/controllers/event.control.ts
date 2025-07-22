@@ -1,6 +1,10 @@
 import BookingModel from "../models/booking.model";
 import EventModel from "../models/event.model";
 import { EventBookingUtils } from "../utilities/eventbooking.util";
+import { findEventById } from "../utilities/find-event-by-id";
+import { getSearchCriteria } from "../utilities/search-criteria";
+import { getSortCriteria } from "../utilities/sort-criteria";
+
 import { RootController } from "./_root.control";
 
 class EventController extends RootController {
@@ -8,8 +12,22 @@ class EventController extends RootController {
     super(EventModel, "Event");
   }
 
+  private validateFutureDate(date: Date, fieldName: string = "date") {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+
+    const inputDate = new Date(date);
+
+    if (inputDate < tomorrow) {
+      throw new Error(`${fieldName} must be in the future`);
+    }
+  }
+
   async createEvent(data: any, organizerId: string) {
     try {
+      this.validateFutureDate(data.date, "Event date");
+
       const eventData = {
         ...data,
         organizer: organizerId,
@@ -35,49 +53,8 @@ class EventController extends RootController {
       const limit = parseInt(queryParams.limit) || 10;
       const skip = (page - 1) * limit;
 
-      let searchCriteria: any = { ...filter };
-
-      if (queryParams.search) {
-        searchCriteria.$or = [
-          { name: { $regex: queryParams.search, $options: "i" } },
-          { description: { $regex: queryParams.search, $options: "i" } },
-          { venue: { $regex: queryParams.search, $options: "i" } },
-          { category: { $regex: queryParams.search, $options: "i" } },
-        ];
-      }
-
-      if (queryParams.category) {
-        searchCriteria.category = queryParams.category;
-      }
-
-      if (queryParams.status) {
-        searchCriteria.status = queryParams.status;
-      }
-
-      if (queryParams.priceFilter) {
-        if (queryParams.priceFilter === "free") {
-          searchCriteria.isFree = true;
-        } else if (queryParams.priceFilter === "paid") {
-          searchCriteria.isFree = false;
-        }
-      }
-
-      let sortCriteria: any = { createdAt: -1 };
-      if (queryParams.sortBy) {
-        switch (queryParams.sortBy) {
-          case "date":
-            sortCriteria = { date: 1 };
-            break;
-          case "name":
-            sortCriteria = { name: 1 };
-            break;
-          case "price":
-            sortCriteria = { price: 1 };
-            break;
-          default:
-            sortCriteria = { createdAt: -1 };
-        }
-      }
+      const searchCriteria = getSearchCriteria(filter, queryParams);
+      const sortCriteria = getSortCriteria(queryParams.sortBy);
 
       const query = this.model
         .find(searchCriteria)
@@ -145,20 +122,14 @@ class EventController extends RootController {
 
   async updateEvent(eventId: string, updateData: any, userId: string) {
     try {
-      const event = await EventBookingUtils.findEventById(eventId);
+      const event = await findEventById(eventId);
 
       if (event.status === "completed") {
         throw new Error("Completed events cannot be updated");
       }
 
-      const eventDate = new Date(event.date);
-      const currentDate = new Date();
-      if (eventDate < currentDate) {
-        throw new Error("Past events cannot be updated");
-      }
-
-      if (event.organizer.toString() !== userId) {
-        throw new Error("You are not authorized to update this event");
+      if (updateData.date) {
+        this.validateFutureDate(updateData.date, "Event date");
       }
 
       if (updateData.totalSeats) {
@@ -190,11 +161,7 @@ class EventController extends RootController {
 
   async deleteEvent(eventId: string, userId: string) {
     try {
-      const event = await EventBookingUtils.findEventById(eventId);
-
-      if (event.organizer.toString() !== userId) {
-        throw new Error("You are not authorized to delete this event");
-      }
+      const event = await findEventById(eventId);
 
       await this.model.findByIdAndDelete(eventId);
       return { message: "Event deleted successfully" };
@@ -205,7 +172,7 @@ class EventController extends RootController {
 
   async toggleEventStatus(eventId: string, userId: string) {
     try {
-      const event = await EventBookingUtils.findEventById(eventId);
+      const event = await findEventById(eventId);
 
       if (event.status === "completed") {
         throw new Error("Completed events cannot have their status changed");
@@ -215,10 +182,6 @@ class EventController extends RootController {
       const currentDate = new Date();
       if (eventDate < currentDate) {
         throw new Error("Past events cannot have their status changed");
-      }
-
-      if (event.organizer.toString() !== userId) {
-        throw new Error("You are not authorized to update this event");
       }
 
       const newStatus = event.status === "active" ? "cancelled" : "active";

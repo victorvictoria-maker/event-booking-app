@@ -11,7 +11,6 @@ import {
 import { EventModalComponent } from '../event-modal/event-modal.component';
 import { EventFiltersComponent } from '../event-filters/event-filters.component';
 import { EventTableComponent } from '../event-table/event-table.component';
-import { FormatNumber } from '../../utils/formatNumber';
 import { EventPaginationComponent } from '../event-pagination/event-pagination.component';
 import categories from '../../data/eventCategories';
 import { ToastrService } from 'ngx-toastr';
@@ -23,7 +22,6 @@ import { BookingService } from '../../services/booking.service';
     CommonModule,
     EventFiltersComponent,
     EventTableComponent,
-    FormatNumber,
     EventPaginationComponent,
   ],
   templateUrl: './admin-event-management.component.html',

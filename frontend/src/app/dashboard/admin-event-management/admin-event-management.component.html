@@ -17,7 +17,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title opacity-75 mb-1">Total Events</h6>
-                            <h3 class="mb-0">{{ eventStats.totalEvents | numberFormat }}</h3>
+                            <h3 class="mb-0">{{ eventStats.totalEvents | number:'1.0-0' }}</h3>
                         </div>
                         <i class="fas fa-calendar-alt fs-3 opacity-75"></i>
                     </div>
@@ -30,7 +30,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title opacity-75 mb-1">Active Events</h6>
-                            <h3 class="mb-0">{{ eventStats.activeEvents | numberFormat }}</h3>
+                            <h3 class="mb-0">{{ eventStats.activeEvents | number:'1.0-0' }}</h3>
                         </div>
                         <i class="fas fa-play-circle fs-3 opacity-75"></i>
                     </div>
@@ -43,7 +43,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title opacity-75 mb-1">Total Bookings</h6>
-                            <h3 class="mb-0">{{ eventStats.totalBookings | numberFormat }}</h3>
+                            <h3 class="mb-0">{{ eventStats.totalBookings | number:'1.0-0' }}</h3>
                         </div>
                         <i class="fas fa-ticket-alt fs-3 opacity-75"></i>
                     </div>
@@ -56,7 +56,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="card-title opacity-75 mb-1">Available Seats</h6>
-                            <h3 class="mb-0">{{ eventStats.availableSeats |numberFormat }}</h3>
+                            <h3 class="mb-0">{{ eventStats.availableSeats | number:'1.0-0'}}</h3>
                         </div>
                         <i class="fas fa-chair fs-3 opacity-75"></i>
                     </div>

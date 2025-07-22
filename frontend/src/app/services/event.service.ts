@@ -33,24 +33,7 @@ export class EventService {
     page: number = 1,
     limit: number = 10
   ): Observable<any> {
-    let params = new HttpParams()
-      .set('page', page.toString())
-      .set('limit', limit.toString());
-
-    if (filters) {
-      if (filters.searchTerm) {
-        params = params.set('search', filters.searchTerm);
-      }
-      if (filters.category) {
-        params = params.set('category', filters.category.toLowerCase());
-      }
-      if (filters.status) {
-        params = params.set('status', filters.status);
-      }
-      if (filters.priceFilter) {
-        params = params.set('priceFilter', filters.priceFilter);
-      }
-    }
+    const params = this.getFilterParams(filters, page, limit);
 
     return this.http
       .get(`${this.api}/event`, {
@@ -234,6 +217,33 @@ export class EventService {
         }),
         catchError(this.handleError)
       );
+  }
+
+  private getFilterParams(
+    filters?: EventFilters,
+    page: number = 1,
+    limit: number = 10
+  ): HttpParams {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString());
+
+    if (filters) {
+      if (filters.searchTerm) {
+        params = params.set('search', filters.searchTerm);
+      }
+      if (filters.category) {
+        params = params.set('category', filters.category.toLowerCase());
+      }
+      if (filters.status) {
+        params = params.set('status', filters.status);
+      }
+      if (filters.priceFilter) {
+        params = params.set('priceFilter', filters.priceFilter);
+      }
+    }
+
+    return params;
   }
 
   private handleError(error: HttpErrorResponse) {

@@ -2,11 +2,12 @@ import { Request, Response } from "express";
 import { RootService } from "./_root.service";
 import { Status } from "../interfaces/status.interface";
 import EventController from "../controllers/event.control";
+import { UserRequestI } from "../interfaces/user-request.interface";
 
 const { SUCCESS, ERROR, CREATED, NOT_FOUND } = Status;
 
 class EventService extends RootService {
-  getAllEvents = async (req: Request, res: Response) => {
+  getAllEvents = async (req: UserRequestI, res: Response) => {
     try {
       const data = await EventController.getAllEvents({}, req.query, [
         { path: "organizer", select: "username email" },
@@ -32,7 +33,7 @@ class EventService extends RootService {
     }
   };
 
-  getEventById = async (req: Request, res: Response) => {
+  getEventById = async (req: UserRequestI, res: Response) => {
     try {
       const { id } = req.params;
       const data = await EventController.getEventById(id);
@@ -57,7 +58,7 @@ class EventService extends RootService {
     }
   };
 
-  createEvent = async (req: Request, res: Response) => {
+  createEvent = async (req: UserRequestI, res: Response) => {
     try {
       const userId = (req as any).user.userId;
       const data = await EventController.createEvent(req.body, userId);
@@ -82,7 +83,7 @@ class EventService extends RootService {
     }
   };
 
-  updateEvent = async (req: Request, res: Response) => {
+  updateEvent = async (req: UserRequestI, res: Response) => {
     try {
       const { id } = req.params;
       const userId = (req as any).user.userId;
@@ -109,7 +110,7 @@ class EventService extends RootService {
     }
   };
 
-  deleteEvent = async (req: Request, res: Response) => {
+  deleteEvent = async (req: UserRequestI, res: Response) => {
     try {
       const { id } = req.params;
       const userId = (req as any).user.userId;
@@ -136,7 +137,7 @@ class EventService extends RootService {
     }
   };
 
-  toggleEventStatus = async (req: Request, res: Response) => {
+  toggleEventStatus = async (req: UserRequestI, res: Response) => {
     try {
       const { id } = req.params;
       const userId = (req as any).user.userId;
@@ -163,7 +164,7 @@ class EventService extends RootService {
     }
   };
 
-  getEventStats = async (req: Request, res: Response) => {
+  getEventStats = async (req: UserRequestI, res: Response) => {
     try {
       const data = await EventController.getEventStats();
 

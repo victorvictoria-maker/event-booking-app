@@ -1,9 +1,10 @@
 import { Document, Schema, model, Model } from "mongoose";
+import { CategoryI } from "../data/category.enum";
 
 export interface IEvent extends Document {
   name: string;
   description: string;
-  category: string;
+  category: CategoryI;
   venue: string;
   date: Date;
   time: string;
@@ -35,23 +36,7 @@ const schema = new Schema<IEvent>(
     category: {
       type: String,
       required: [true, "Event category is required"],
-      enum: [
-        "conference",
-        "workshop",
-        "seminar",
-        "concert",
-        "festival",
-        "sports",
-        "exhibition",
-        "networking",
-        "webinar",
-        "party",
-        "charity",
-        "business",
-        "education",
-        "entertainment",
-        "other",
-      ],
+      enum: Object.values(CategoryI),
     },
     venue: {
       type: String,
@@ -61,12 +46,6 @@ const schema = new Schema<IEvent>(
     date: {
       type: Date,
       required: [true, "Event date is required"],
-      validate: {
-        validator: function (value: Date) {
-          return value > new Date();
-        },
-        message: "Event date must be in the future",
-      },
     },
     time: {
       type: String,
