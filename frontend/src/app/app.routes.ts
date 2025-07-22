@@ -35,20 +35,80 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'dashboard',
+    path: '',
     loadComponent: () =>
-      import('./dashboard/dashboard/dashboard.component').then(
-        (m) => m.DashboardComponent
+      import('./dashboard/dashboard-layout/dashboard-layout.component').then(
+        (m) => m.DashboardLayoutComponent
       ),
     canActivate: [AuthGuard],
+    children: [
+      // {
+      //   path: 'dashboard',
+      //   loadComponent: () =>
+      //     import('./dashboard/user-dashboard/user-dashboard.component').then(
+      //       (m) => m.UserDashboardComponent
+      //     ),
+      // },
+      {
+        path: 'events',
+        loadComponent: () =>
+          import(
+            './dashboard/user-event-management/user-event-management.component'
+          ).then((m) => m.UserEventManagementComponent),
+      },
+      {
+        path: 'bookings',
+        loadComponent: () =>
+          import('./dashboard/user-bookings/user-bookings.component').then(
+            (m) => m.UserBookingsComponent
+          ),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./dashboard/user-profile/user-profile.component').then(
+            (m) => m.UserProfileComponent
+          ),
+      },
+    ],
   },
   {
-    path: 'admin/dashboard',
+    path: 'admin',
     loadComponent: () =>
-      import('./dashboard/admin-dashboard/admin-dashboard.component').then(
-        (m) => m.AdminDashboardComponent
+      import('./dashboard/dashboard-layout/dashboard-layout.component').then(
+        (m) => m.DashboardLayoutComponent
       ),
     canActivate: [AuthGuard],
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./dashboard/admin-dashboard/admin-dashboard.component').then(
+            (m) => m.AdminDashboardComponent
+          ),
+      },
+      {
+        path: 'events',
+        loadComponent: () =>
+          import(
+            './dashboard/admin-event-management/admin-event-management.component'
+          ).then((m) => m.AdminEventManagementComponent),
+      },
+      {
+        path: 'bookings',
+        loadComponent: () =>
+          import('./dashboard/admin-bookings/admin-bookings.component').then(
+            (m) => m.AdminBookingsComponent
+          ),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('./dashboard/admin-profile/admin-profile.component').then(
+            (m) => m.AdminProfileComponent
+          ),
+      },
+    ],
   },
   {
     path: '**',

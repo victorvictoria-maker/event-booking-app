@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal, Input, OnInit } from '@angular/core';
+import { Component, signal, Input, OnInit, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login-form',
@@ -20,8 +21,14 @@ export class LoginFormComponent implements OnInit {
     const token = localStorage.getItem('event-booking-app-token');
     const isAdmin = localStorage.getItem('event-booking-is-admin') === 'true';
 
+    const currentUrl = this.router.url;
+
     if (token) {
-      this.router.navigateByUrl(isAdmin ? '/admin/dashboard' : '/dashboard');
+      if (isAdmin && currentUrl === '/admin/login') {
+        this.router.navigateByUrl('/admin/dashboard');
+      } else if (!isAdmin && currentUrl === '/login') {
+        this.router.navigateByUrl('/events');
+      }
     }
   }
 
@@ -34,12 +41,13 @@ export class LoginFormComponent implements OnInit {
 
   private returnUrl: string | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  private toastr = inject(ToastrService);
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
+  constructor() {
     this.loginForm = this.fb.group({
       usernameOrEmail: ['', [Validators.required]],
       password: ['', [Validators.required]],
@@ -76,15 +84,13 @@ export class LoginFormComponent implements OnInit {
         if (this.returnUrl) {
           this.router.navigateByUrl(this.returnUrl);
         } else {
-          this.router.navigateByUrl(
-            result.isAdmin ? 'admin/dashboard' : 'dashboard'
-          );
+          const isAdmin = result.isAdmin;
+          this.router.navigateByUrl(isAdmin ? 'admin/dashboard' : 'events');
         }
       },
       error: (error) => {
         this.isLoading.set(false);
-        alert(error.message);
-        console.error('Login failed:', error.message);
+        this.toastr.error('Login failed:', error.message);
       },
     });
   }

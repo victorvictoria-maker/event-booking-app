@@ -1,0 +1,74 @@
+<div class="dashboard-container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-link d-lg-none p-0 me-3" type="button" (click)="toggleSidebar()"
+                    [attr.aria-expanded]="!isSidebarCollapsed">
+                    <i class="fas fa-bars text-secondary"></i>
+                </button>
+
+                <a class="navbar-brand d-flex align-items-center text-decoration-none" href="#">
+                    <i class="fas fa-calendar-check text-primary me-2 fs-4"></i>
+                    <span class="fw-bold textSecondary">EventBooker</span>
+                </a>
+            </div>
+
+            <div class="d-none d-md-flex flex-grow-1 mx-4">
+                <div class="input-group" style="max-width: 400px;">
+                    <input type="text" class="form-control border-0 bg-light" placeholder="Search events, bookings..."
+                        [(ngModel)]="searchQuery" (keyup.enter)="onSearch()">
+                    <button class="btn btn-light border-0" type="button" (click)="onSearch()">
+                        <i class="fas fa-search textGray"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="d-flex align-items-center">
+                <div class="dropdown">
+                    <button class="btn btn-link d-flex align-items-center text-decoration-none p-2" type="button"
+                        data-bs-toggle="dropdown">
+                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2"
+                            style="width: 32px; height: 32px;">
+                            <i class="fas fa-user text-white smallFont"></i>
+                        </div>
+                        <div class="d-none d-sm-block text-start">
+                            <div class="textSecondary fw-semibold smallFont">{{ userName | titlecase }}</div>
+                            <div class="textGray" style="font-size: 0.75rem;">{{ userRole | titlecase }}</div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <div class="dashboard-body">
+        <nav class="sidebar bg-white border-end" [class.collapsed]="isSidebarCollapsed">
+            <div class="sidebar-content">
+                <ul class="nav flex-column pt-3">
+                    <li class="nav-item" *ngFor="let item of menuItems">
+                        <a class="nav-link d-flex align-items-center py-3 px-3 text-decoration-none"
+                            [routerLink]="item.route" routerLinkActive="active">
+                            <i [class]="item.icon + ' me-3'"></i>
+                            <span class="nav-text">{{ item.label }}</span>
+                        </a>
+                    </li>
+                    <li>
+                        <hr class="dropdown-divider">
+                    </li>
+                    <li class="nav-link d-flex align-items-center py-3 px-3 text-decoration-none smallFont text-danger"
+                        (click)="logOut()"><i class="fas fa-sign-out-alt me-2"></i> <span class="nav-text">Sign
+                            Out</span></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <router-outlet></router-outlet>
+        </main>
+    </div>
+
+</div>
+
+
+<div class="sidebar-overlay d-lg-none" [class.show]="!isSidebarCollapsed" (click)="toggleSidebar()"></div>

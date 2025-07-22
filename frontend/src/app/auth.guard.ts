@@ -1,23 +1,25 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   ActivatedRouteSnapshot,
   CanActivate,
   Router,
   RouterStateSnapshot,
 } from '@angular/router';
+import { AuthService } from './services/auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(private router: Router) {}
+  private router = inject(Router);
+  public authService = inject(AuthService);
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    const isLoggedIn = Boolean(localStorage.getItem('event-booking-app-token'));
-    const isAdmin = localStorage.getItem('event-booking-is-admin') === 'true';
+    const isLoggedIn = this.authService.isLoggedIn();
+    const isAdmin = this.authService.isAdmin();
     const currentPath = state.url;
 
     if (!isLoggedIn) {
@@ -28,15 +30,18 @@ export class AuthGuard implements CanActivate {
     }
 
     if (isAdmin && !currentPath.startsWith('/admin')) {
-      this.router.navigateByUrl('admin/login');
+      if (!currentPath.startsWith('/admin/login')) {
+        this.router.navigateByUrl('/admin/login');
+      }
       return false;
     }
 
     if (!isAdmin && currentPath.startsWith('/admin')) {
-      this.router.navigateByUrl('login');
+      if (!currentPath.startsWith('/login')) {
+        this.router.navigateByUrl('/login');
+      }
       return false;
     }
-
     return true;
   }
 }

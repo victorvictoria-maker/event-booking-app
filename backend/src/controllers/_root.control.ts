@@ -22,9 +22,9 @@ export class RootController {
       return true;
     }
   };
-  getDocumentCount = async (conditon = {}, query?: object) => {
+  getDocumentCount = async (condition = {}, query?: object) => {
     const { filter } = QueryHelper.build_query(query);
-    return await this.model.countDocuments({ ...filter, ...conditon });
+    return await this.model.countDocuments({ ...filter, ...condition });
   };
   create = async (payload: any) => {
     try {
@@ -50,14 +50,14 @@ export class RootController {
       .populate(populate);
   }
   fetchAllWithPagination = async (
-    conditon: object,
+    condition: object,
     query?: FetchAllQuery,
     select: string | object = "",
     populate?: ModelPopulateI[]
   ): Promise<FetchWithPaginationDataI> => {
     try {
-      const records = await this.fetchAll(conditon, query, select, populate);
-      const total_records = await this.getDocumentCount(conditon, query);
+      const records = await this.fetchAll(condition, query, select, populate);
+      const total_records = await this.getDocumentCount(condition, query);
       return { records, total_records };
     } catch (error) {
       throw error;
