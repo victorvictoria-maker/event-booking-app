@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -11,7 +11,8 @@ import { CommonModule } from '@angular/common';
   styleUrl: './dashboard-layout.component.css',
 })
 export class DashboardLayoutComponent {
-  constructor(private authService: AuthService, private router: Router) {}
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   @Input()
   userName: string = 'Victoria Victor';

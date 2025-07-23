@@ -34,7 +34,7 @@ class AuthController extends RootController {
     let token;
     if (user) {
       token = tokenUtil.sign_user(
-        { userId: user._id, email: user.email },
+        { userId: user._id, email: user.email, isAdmin: user.isAdmin },
         "7d"
       );
     }
@@ -57,7 +57,7 @@ class AuthController extends RootController {
     if (!isValid) throw new Error("Invalid password.");
 
     const token = tokenUtil.sign_user(
-      { userId: user._id, email: user.email },
+      { userId: user._id, email: user.email, isAdmin: user.isAdmin },
       "7d"
     );
 

@@ -41,5 +41,55 @@ class AuthMidWare extends RootService {
       });
     }
   };
+  adminOnly = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await this._is_authenticated(req);
+
+      const user = (req as any).user;
+      if (!user.isAdmin) {
+        throw {
+          status: Status.UN_AUTHORIZED,
+          message: "Admin access is required",
+        };
+      }
+
+      next();
+    } catch (error) {
+      const { status, message, data } = this.get_error(error);
+      return this.sendResponse({
+        req,
+        res,
+        status: status || Status.UN_AUTHORIZED,
+        message: message || "Admin access is required",
+        data,
+        error,
+      });
+    }
+  };
+  userOnly = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await this._is_authenticated(req);
+
+      const user = (req as any).user;
+      if (user.isAdmin) {
+        throw {
+          status: Status.UN_AUTHORIZED,
+          message: "User access only",
+        };
+      }
+
+      next();
+    } catch (error) {
+      const { status, message, data } = this.get_error(error);
+      return this.sendResponse({
+        req,
+        res,
+        status: status || Status.UN_AUTHORIZED,
+        message: message || "User access only",
+        data,
+        error,
+      });
+    }
+  };
 }
 export default new AuthMidWare();

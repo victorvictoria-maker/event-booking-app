@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal, Input, OnInit } from '@angular/core';
+import { Component, signal, Input, OnInit, inject } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-login-form',
@@ -40,12 +41,13 @@ export class LoginFormComponent implements OnInit {
 
   private returnUrl: string | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private route: ActivatedRoute,
-    private router: Router
-  ) {
+  private toastr = inject(ToastrService);
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+
+  constructor() {
     this.loginForm = this.fb.group({
       usernameOrEmail: ['', [Validators.required]],
       password: ['', [Validators.required]],
@@ -88,8 +90,7 @@ export class LoginFormComponent implements OnInit {
       },
       error: (error) => {
         this.isLoading.set(false);
-        alert(error.message);
-        console.error('Login failed:', error.message);
+        this.toastr.error('Login failed:', error.message);
       },
     });
   }

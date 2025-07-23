@@ -2,6 +2,9 @@
     <h4 class="modal-title textSecondary fw-bold">
         Event Details
     </h4>
+    <span *ngIf="isUserBooked" class="badge bg-success ms-2">
+        <i class="fas fa-check-circle me-1"></i>You're Booked!
+    </span>
     <button type="button" class="btn-close" (click)="dismiss()"></button>
 </div>
 
@@ -11,7 +14,7 @@
             <div class="d-flex justify-content-between align-items-start mb-3">
                 <div>
                     <h3 class="textSecondary fw-bold mb-2">{{ event.name }}</h3>
-                    <span class="badge" [class]="getStatusBadgeClass()">
+                    <span class="badge" [class]="getEventStatusBadgeClass()">
                         {{ getEventStatusText() | titlecase }}
                     </span>
                 </div>
@@ -124,14 +127,4 @@
             </div>
         </div>
     </div>
-</div>
-
-<div class="modal-footer border-0">
-    <button type="button" class="btn btn-outline-secondary" (click)="dismiss()">
-        Close
-    </button>
-    <button type="button" class="btn btn-primary" (click)="onBookEvent()" [disabled]="!isEventBookable()">
-        <i class="fas fa-ticket-alt me-2"></i>
-        {{ getAvailableSeats() === 0 ? 'Sold Out' : 'Book Now' }}
-    </button>
 </div>

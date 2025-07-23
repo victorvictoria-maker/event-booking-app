@@ -13,8 +13,9 @@
         (filtersChange)="onFiltersChange($event)" (clearFilters)="onClearFilters()"></app-event-filters>
 
 
-    <app-event-table [events]="filteredEvents" [mode]="'user'" [isLoading]="isLoading()"
-        (viewEvent)="onViewEvent($event)" [totalEvents]="paginationData.totalItems"></app-event-table>
+    <app-event-table [events]="filteredEvents" [mode]="'user'" [isLoading]="isLoading()" [userBookings]="userBookings"
+        [bookingLoadingStates]="bookingLoadingStates()" (viewEvent)="onViewEvent($event)"
+        (bookEvent)="onBookEvent($event)" [totalEvents]="paginationData.totalItems"></app-event-table>
 
 
     <app-event-pagination [paginationData]="paginationData" ariaLabel="Available events pagination"

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { EventService } from '../../services/event.service';
 import { Event, EventFilters, PaginationData } from '../../models/event.model';
 import { EventFiltersComponent } from '../event-filters/event-filters.component';
@@ -8,6 +8,9 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventDetailsModalComponent } from '../event-details-modal/event-details-modal.component';
 import { EventPaginationComponent } from '../event-pagination/event-pagination.component';
 import categories from '../../data/eventCategories';
+import { BookingService } from '../../services/booking.service';
+import { EventUtilsService } from '../../utils/eventUtility';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-user-event-management',
@@ -24,6 +27,14 @@ export class UserEventManagementComponent {
   events: Event[] = [];
   filteredEvents: Event[] = [];
   isLoading = signal(false);
+  userBookings: any[] = [];
+  bookingLoadingStates = signal<Record<string, boolean>>({});
+
+  private eventService = inject(EventService);
+  private bookingService = inject(BookingService);
+  public modalService = inject(NgbModal);
+  private eventUtils = inject(EventUtilsService);
+  private toastr = inject(ToastrService);
 
   paginationData: PaginationData = {
     currentPage: 1,
@@ -43,13 +54,9 @@ export class UserEventManagementComponent {
 
   categories = categories;
 
-  constructor(
-    private eventService: EventService,
-    private modalService: NgbModal
-  ) {}
-
   ngOnInit() {
     this.loadEvents();
+    this.loadUserBookings();
   }
 
   loadEvents(page: number = 1) {
@@ -78,10 +85,20 @@ export class UserEventManagementComponent {
         },
         error: (error) => {
           this.isLoading.set(false);
-          console.error('Failed to load events:', error.message);
-          alert('Failed to load events: ' + error.message);
+          this.toastr.error('Failed to load events: ' + error.message);
         },
       });
+  }
+
+  loadUserBookings() {
+    this.bookingService.getUserBookings().subscribe({
+      next: (response) => {
+        this.userBookings = response.data?.bookings || [];
+      },
+      error: (error) => {
+        this.toastr.error('Failed to load user bookings: ' + error.message);
+      },
+    });
   }
 
   onFiltersChange(newFilters: EventFilters) {
@@ -124,6 +141,8 @@ export class UserEventManagementComponent {
     });
 
     modalRef.componentInstance.event = event;
+    modalRef.componentInstance.userBookings = this.userBookings;
+    modalRef.componentInstance.isBookingInProgress = this.isBookingInProgress;
 
     modalRef.componentInstance.bookEvent.subscribe((eventData: Event) => {
       this.onBookEvent(eventData);
@@ -131,12 +150,92 @@ export class UserEventManagementComponent {
   }
 
   onBookEvent(event: Event) {
-    alert('Booking event coming soon.');
+    const userBooking = this.getUserBookingForEvent(event._id);
+
+    if (userBooking) {
+      this.cancelBooking(userBooking._id, event);
+    } else {
+      this.createBooking(event);
+    }
+  }
+
+  private createBooking(event: Event) {
+    if (!this.eventUtils.isEventBookable(event)) {
+      this.toastr.error('This event is not available for booking.');
+      return;
+    }
+
+    this.setBookingLoading(event._id, true);
+
+    this.bookingService.createBooking(event._id).subscribe({
+      next: (response) => {
+        this.setBookingLoading(event._id, false);
+        this.toastr.success('Event booked successfully!');
+
+        this.loadEvents(this.paginationData.currentPage);
+        this.loadUserBookings();
+      },
+      error: (error) => {
+        this.setBookingLoading(event._id, false);
+        this.toastr.error('Failed to book event:', error.message);
+      },
+    });
+  }
+
+  private cancelBooking(bookingId: string, event: Event) {
+    this.setBookingLoading(event._id, true);
+
+    this.bookingService.cancelBooking(bookingId).subscribe({
+      next: (response) => {
+        this.setBookingLoading(event._id, false);
+        this.toastr.success('Booking cancelled successfully!');
+
+        this.loadEvents(this.paginationData.currentPage);
+        this.loadUserBookings();
+      },
+      error: (error) => {
+        this.setBookingLoading(event._id, false);
+        this.toastr.success('Failed to cancel booking:', error.message);
+      },
+    });
+  }
+
+  private setBookingLoading(eventId: string, loading: boolean) {
+    const currentStates = this.bookingLoadingStates();
+    this.bookingLoadingStates.set({
+      ...currentStates,
+      [eventId]: loading,
+    });
+  }
+
+  private getUserBookingForEvent(eventId: string): any {
+    return this.userBookings.find(
+      (booking) => booking.eventId === eventId || booking.event?._id === eventId
+    );
+  }
+
+  hasUserBookedEvent(eventId: string): boolean {
+    return this.eventUtils.hasUserBookedEvent(eventId, this.userBookings);
+  }
+
+  getBookingButtonText(event: Event): string {
+    return this.eventUtils.getBookingButtonText(event, this.userBookings);
+  }
+
+  isBookingButtonDisabled(event: Event): boolean {
+    return (
+      this.eventUtils.isBookingButtonDisabled(event, this.userBookings) ||
+      this.isBookingInProgress(event._id)
+    );
+  }
+
+  isBookingInProgress(eventId: string): boolean {
+    return this.bookingLoadingStates()[eventId] || false;
   }
 
   getAvailableEventsCount(): number {
     return this.filteredEvents.filter(
-      (event) => event.totalSeats - event.bookedSeats > 0
+      (event) => this.eventUtils.getAvailableSeats(event) > 0
     ).length;
   }
 
@@ -146,7 +245,7 @@ export class UserEventManagementComponent {
 
   getTotalAvailableSeats(): number {
     return this.filteredEvents.reduce(
-      (acc, event) => acc + (event.totalSeats - event.bookedSeats),
+      (acc, event) => acc + this.eventUtils.getAvailableSeats(event),
       0
     );
   }

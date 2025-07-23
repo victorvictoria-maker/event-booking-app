@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { Event } from '../../models/event.model';
+import { EventUtilsService } from '../../utils/eventUtility';
 
 export type EventTableMode = 'admin' | 'user';
 
@@ -15,12 +16,16 @@ export class EventTableComponent {
   @Input() mode: EventTableMode = 'admin';
   @Input() isLoading: boolean = false;
   @Input() totalEvents: number = 0;
+  @Input() userBookings: any[] = [];
+  @Input() bookingLoadingStates: Record<string, boolean> = {};
 
   @Output() editEvent = new EventEmitter<Event>();
   @Output() deleteEvent = new EventEmitter<string>();
   @Output() toggleEventStatus = new EventEmitter<string>();
   @Output() bookEvent = new EventEmitter<Event>();
   @Output() viewEvent = new EventEmitter<Event>();
+
+  private eventUtils = inject(EventUtilsService);
 
   onEditEvent(event: Event) {
     this.editEvent.emit(event);
@@ -45,41 +50,57 @@ export class EventTableComponent {
   }
 
   getAvailableSeats(event: Event): number {
-    return event.totalSeats - event.bookedSeats;
+    return this.eventUtils.getAvailableSeats(event);
   }
 
-  getStatusBadgeClass(status: string): string {
-    switch (status) {
-      case 'active':
-        return 'bg-success';
-      case 'cancelled':
-        return 'bg-danger';
-      case 'completed':
-        return 'bg-secondary';
-      default:
-        return 'bg-secondary';
-    }
+  getEventStatusBadgeClass(status: string): string {
+    return this.eventUtils.getEventStatusBadgeClass(status);
   }
 
   getBookingPercentage(event: Event): number {
-    return (event.bookedSeats / event.totalSeats) * 100;
+    return this.eventUtils.getBookingPercentage(event);
   }
 
   formatPrice(event: Event): string {
-    if (event.isFree) {
-      return 'Free';
-    }
-    return event.price ? `₦${event.price.toLocaleString()}` : 'Free';
+    return this.eventUtils.formatPrice(event);
   }
 
   isEventBookable(event: Event): boolean {
-    return event.status === 'active' && this.getAvailableSeats(event) > 0;
+    return this.eventUtils.isEventBookable(event);
   }
 
   getEventStatusText(event: Event): string {
-    if (event.status === 'active' && this.getAvailableSeats(event) === 0) {
-      return 'Sold Out';
-    }
-    return event.status;
+    return this.eventUtils.getEventStatusText(event);
+  }
+
+  hasUserBookedEvent(eventId: string): boolean {
+    return this.eventUtils.hasUserBookedEvent(eventId, this.userBookings);
+  }
+
+  getBookingButtonText(event: Event): string {
+    return this.eventUtils.getBookingButtonText(event, this.userBookings);
+  }
+
+  isBookingButtonDisabled(event: Event): boolean {
+    return (
+      this.eventUtils.isBookingButtonDisabled(event, this.userBookings) ||
+      this.isBookingInProgress(event._id)
+    );
+  }
+
+  getBookingButtonClass(event: Event): string {
+    return this.eventUtils.getBookingButtonClass(
+      event,
+      this.userBookings,
+      'btn btn-sm'
+    );
+  }
+
+  isBookingInProgress(eventId: string): boolean {
+    return this.bookingLoadingStates[eventId] || false;
+  }
+
+  isEventPast(event: Event): boolean {
+    return this.eventUtils.isEventPast(event);
   }
 }

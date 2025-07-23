@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './user-dashboard.component.css',
 })
 export class UserDashboardComponent {
-  constructor(private authService: AuthService) {}
+  private authService = inject(AuthService);
 
   logOut() {
     this.authService.logout();

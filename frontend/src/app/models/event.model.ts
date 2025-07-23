@@ -38,13 +38,6 @@ export interface EventStats {
   availableSeats: number;
 }
 
-export interface CategoryStats {
-  count: number;
-  bookedSeats: number;
-  totalSeats: number;
-  events: any[];
-}
-
 export interface PaginationData {
   currentPage: number;
   totalPages: number;

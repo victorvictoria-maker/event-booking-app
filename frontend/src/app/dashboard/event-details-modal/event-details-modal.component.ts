@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 import { Event } from '../../models/event.model';
 import { FormatNumber } from '../../utils/formatNumber';
+import { EventUtilsService } from '../../utils/eventUtility';
 
 @Component({
   selector: 'app-event-details-modal',
@@ -12,52 +13,66 @@ import { FormatNumber } from '../../utils/formatNumber';
 })
 export class EventDetailsModalComponent {
   @Input() event!: Event;
+  @Input() userBookings: any[] = [];
+  @Input() isBookingInProgress: boolean = false;
   @Output() bookEvent = new EventEmitter<Event>();
 
-  constructor(public activeModal: NgbActiveModal) {}
+  private eventUtils = inject(EventUtilsService);
+  public activeModal = inject(NgbActiveModal);
 
   onBookEvent() {
     this.bookEvent.emit(this.event);
     this.activeModal.close();
   }
 
+  get isUserBooked(): boolean {
+    return this.eventUtils.hasUserBookedEvent(
+      this.event._id,
+      this.userBookings
+    );
+  }
+
   getAvailableSeats(): number {
-    return this.event.totalSeats - this.event.bookedSeats;
+    return this.eventUtils.getAvailableSeats(this.event);
   }
 
   getBookingPercentage(): number {
-    return (this.event.bookedSeats / this.event.totalSeats) * 100;
+    return this.eventUtils.getBookingPercentage(this.event);
   }
 
   formatPrice(): string {
-    if (this.event.isFree) {
-      return 'Free';
-    }
-    return this.event.price ? `₦${this.event.price.toLocaleString()}` : 'Free';
+    return this.eventUtils.formatPrice(this.event);
   }
 
   isEventBookable(): boolean {
-    return this.event.status === 'active' && this.getAvailableSeats() > 0;
+    return this.eventUtils.isEventBookable(this.event);
   }
 
-  getStatusBadgeClass(): string {
-    switch (this.event.status) {
-      case 'active':
-        return 'bg-success';
-      case 'cancelled':
-        return 'bg-danger';
-      case 'completed':
-        return 'bg-secondary';
-      default:
-        return 'bg-secondary';
-    }
+  getEventStatusBadgeClass(): string {
+    return this.eventUtils.getEventStatusBadgeClass(this.event.status);
   }
 
   getEventStatusText(): string {
-    if (this.event.status === 'active' && this.getAvailableSeats() === 0) {
-      return 'Sold Out';
-    }
-    return this.event.status;
+    return this.eventUtils.getEventStatusText(this.event);
+  }
+
+  getBookingButtonText(): string {
+    return this.eventUtils.getBookingButtonText(this.event, this.userBookings);
+  }
+
+  getBookingButtonDisabled(): boolean {
+    return (
+      this.eventUtils.isBookingButtonDisabled(this.event, this.userBookings) ||
+      this.isBookingInProgress
+    );
+  }
+
+  getBookingButtonClass(): string {
+    return this.eventUtils.getBookingButtonClass(
+      this.event,
+      this.userBookings,
+      'btn'
+    );
   }
 
   dismiss() {

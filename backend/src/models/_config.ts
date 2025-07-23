@@ -1,6 +1,7 @@
 import mongoose = require("mongoose");
 import env from "../env";
 import chalk = require("chalk");
+import eventCron from "../cron/eventCron";
 
 mongoose.set("strictQuery", false);
 
@@ -11,6 +12,8 @@ export const dbConfig = () => {
       .connect(env.MONGODB_URI)
       .then(() => {
         console.log("✌🏾 Successfully connected to MongoDB");
+
+        eventCron();
       })
       .catch((err) => {
         console.log(err);

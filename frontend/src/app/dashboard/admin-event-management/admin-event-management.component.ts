@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { EventService } from '../../services/event.service';
 import {
-  CategoryStats,
   Event,
   EventFilters,
   EventStats,
@@ -14,6 +13,8 @@ import { EventFiltersComponent } from '../event-filters/event-filters.component'
 import { EventTableComponent } from '../event-table/event-table.component';
 import { EventPaginationComponent } from '../event-pagination/event-pagination.component';
 import categories from '../../data/eventCategories';
+import { ToastrService } from 'ngx-toastr';
+import { BookingService } from '../../services/booking.service';
 
 @Component({
   selector: 'app-admin-event-management',
@@ -30,6 +31,11 @@ export class AdminEventManagementComponent implements OnInit {
   events: Event[] = [];
   filteredEvents: Event[] = [];
   isLoading = signal(false);
+
+  private eventService = inject(EventService);
+  private bookingService = inject(BookingService);
+  public modalService = inject(NgbModal);
+  private toastr = inject(ToastrService);
 
   paginationData: PaginationData = {
     currentPage: 1,
@@ -57,11 +63,6 @@ export class AdminEventManagementComponent implements OnInit {
   categories = categories;
 
   statuses = ['active', 'cancelled', 'completed'];
-
-  constructor(
-    private eventService: EventService,
-    private modalService: NgbModal
-  ) {}
 
   ngOnInit() {
     this.loadEvents();
@@ -97,62 +98,26 @@ export class AdminEventManagementComponent implements OnInit {
 
         error: (error) => {
           this.isLoading.set(false);
-          console.error('Failed to load events:', error.message);
-          alert('Failed to load events: ' + error.message);
+          this.toastr.error('Failed to load user bookings: ' + error.message);
         },
       });
   }
 
   loadEventStats() {
-    this.eventService.getEventStatsByCategory().subscribe({
+    this.eventService.getEventStats().subscribe({
       next: (response) => {
-        if (response.data && Array.isArray(response.data)) {
-          const responseData: CategoryStats[] = response.data;
+        const stats = response.data;
 
-          const totalBookings = responseData.reduce(
-            (sum: number, cat: CategoryStats) => sum + cat.bookedSeats,
-            0
-          );
-
-          const totalSeats = responseData.reduce(
-            (sum: number, cat: CategoryStats) => sum + cat.totalSeats,
-            0
-          );
-
-          const availableSeats = totalSeats - totalBookings;
-
-          this.eventStats = {
-            totalEvents: this.paginationData.totalItems,
-            activeEvents: 0,
-            totalBookings: totalBookings,
-            availableSeats: availableSeats,
-          };
-
-          this.getActiveEventsCount();
-        }
+        this.eventStats = {
+          totalEvents: stats.totalEvents,
+          activeEvents: stats.activeEvents,
+          totalBookings: stats.totalBookings,
+          availableSeats: stats.totalAvailableSeats,
+        };
       },
       error: (error) => {
-        console.error('Failed to load event stats:', error.message);
-      },
-    });
-  }
-
-  getActiveEventsCount() {
-    const activeFilters: EventFilters = {
-      searchTerm: '',
-      category: '',
-      status: 'active',
-      priceFilter: '',
-    };
-
-    this.eventService.getAllEvents(activeFilters, 1, 1).subscribe({
-      next: (response) => {
-        if (response.data?.pagination) {
-          this.eventStats.activeEvents = response.data.pagination.totalItems;
-        }
-      },
-      error: (error) => {
-        console.error('Failed to load active events count:', error.message);
+        console.error('Failed to load event statistics:', error.message);
+        this.toastr.error('Failed to load statistics: ' + error.message);
       },
     });
   }
@@ -205,6 +170,11 @@ export class AdminEventManagementComponent implements OnInit {
   }
 
   openEditEventModal(event: Event) {
+    if (event.status === 'completed') {
+      this.toastr.warning('Completed events cannot be edited');
+      return;
+    }
+
     const modalRef = this.modalService.open(EventModalComponent, {
       size: 'lg',
       centered: true,
@@ -222,14 +192,12 @@ export class AdminEventManagementComponent implements OnInit {
   createEvent(eventData: Event) {
     this.eventService.createEvent(eventData).subscribe({
       next: (response) => {
-        console.log('Event created:', response.message);
-        alert('Event created successfully!');
+        this.toastr.success('Event created successfully!');
         this.loadEvents();
         this.loadEventStats();
       },
       error: (error) => {
-        console.error('Failed to create event:', error.message);
-        alert('Failed to create event: ' + error.message);
+        this.toastr.error('Failed to create event:', error.message);
       },
     });
   }
@@ -237,14 +205,12 @@ export class AdminEventManagementComponent implements OnInit {
   updateEvent(eventData: Event) {
     this.eventService.updateEvent(eventData).subscribe({
       next: (response) => {
-        console.log('Event updated:', response.message);
-        alert('Event updated successfully!');
+        this.toastr.success('Event updated successfully!');
         this.loadEvents();
         this.loadEventStats();
       },
       error: (error) => {
-        console.error('Failed to update event:', error.message);
-        alert('Failed to update event: ' + error.message);
+        this.toastr.error('Failed to update event:', error.message);
       },
     });
   }
@@ -252,29 +218,32 @@ export class AdminEventManagementComponent implements OnInit {
   deleteEvent(eventId: string) {
     this.eventService.deleteEvent(eventId).subscribe({
       next: (response) => {
-        console.log('Event deleted:', response.message);
-        alert('Event deleted successfully!');
+        this.toastr.success('Event deleted successfully!');
         this.loadEvents();
         this.loadEventStats();
       },
       error: (error) => {
-        console.error('Failed to delete event:', error.message);
-        alert('Failed to delete event: ' + error.message);
+        this.toastr.error('Failed to delete event: ' + error.message);
       },
     });
   }
 
   toggleEventStatus(eventId: string) {
+    const event = this.events.find((e) => e._id === eventId);
+
+    if (event && event.status === 'completed') {
+      this.toastr.warning('Completed events cannot have their status changed');
+      return;
+    }
+
     this.eventService.toggleEventStatus(eventId).subscribe({
       next: (response) => {
-        console.log('Event status updated:', response.message);
-        alert('Event status updated successfully!');
+        this.toastr.success('Event status updated successfully!');
         this.loadEvents();
         this.loadEventStats();
       },
       error: (error) => {
-        console.error('Failed to update event status:', error.message);
-        alert('Failed to update event status: ' + error.message);
+        this.toastr.error('Failed to update event status: ' + error.message);
       },
     });
   }

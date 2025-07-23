@@ -9,8 +9,6 @@ export interface IEvent extends Document {
   date: Date;
   time: string;
   totalSeats: number;
-  availableSeats: number;
-  bookedSeats: number;
   price: number;
   isFree: boolean;
   eventPicture?: string;
@@ -48,12 +46,6 @@ const schema = new Schema<IEvent>(
     date: {
       type: Date,
       required: [true, "Event date is required"],
-      // validate: {
-      //   validator: function (value: Date) {
-      //     return value > new Date();
-      //   },
-      //   message: "Event date must be in the future",
-      // },
     },
     time: {
       type: String,
@@ -67,22 +59,6 @@ const schema = new Schema<IEvent>(
       type: Number,
       required: [true, "Total seats is required"],
       min: [1, "Total seats must be at least 1"],
-    },
-    availableSeats: {
-      type: Number,
-      default: function (this: IEvent) {
-        return this.totalSeats || 0;
-      },
-    },
-    bookedSeats: {
-      type: Number,
-      default: 0,
-      validate: {
-        validator: function (this: IEvent, value: number) {
-          return value <= this.totalSeats;
-        },
-        message: "Booked seats cannot exceed total seats",
-      },
     },
     price: {
       type: Number,
@@ -116,7 +92,6 @@ const schema = new Schema<IEvent>(
 );
 
 schema.pre("save", function (this: IEvent) {
-  this.availableSeats = this.totalSeats - this.bookedSeats;
   this.isFree = this.price === 0;
 });
 
@@ -124,7 +99,7 @@ schema.index({ category: 1 });
 schema.index({ date: 1 });
 schema.index({ status: 1 });
 schema.index({ organizer: 1 });
-schema.index({ availableSeats: 1 });
+schema.index({ totalSeats: 1 });
 schema.index({ status: 1, date: 1, category: 1 });
 schema.index({ name: "text", description: "text" });
 

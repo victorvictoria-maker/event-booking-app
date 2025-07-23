@@ -1,7 +1,10 @@
+import BookingModel from "../models/booking.model";
 import EventModel from "../models/event.model";
+import { EventBookingUtils } from "../utilities/eventbooking.util";
 import { findEventById } from "../utilities/find-event-by-id";
 import { getSearchCriteria } from "../utilities/search-criteria";
 import { getSortCriteria } from "../utilities/sort-criteria";
+
 import { RootController } from "./_root.control";
 
 class EventController extends RootController {
@@ -29,8 +32,6 @@ class EventController extends RootController {
         ...data,
         organizer: organizerId,
         totalSeats: data.totalSeats,
-        availableSeats: data.totalSeats,
-        bookedSeats: 0,
         status: "active",
         isFree: data.price === 0,
       };
@@ -67,8 +68,23 @@ class EventController extends RootController {
         });
       }
 
-      const events = await query.exec();
+      const fetchedEvents = await query.exec();
       const total = await this.model.countDocuments(searchCriteria);
+
+      const events = await Promise.all(
+        fetchedEvents.map(async (event) => {
+          const bookedSeats = await BookingModel.countDocuments({
+            event: event._id,
+          });
+          const availableSeats = event.totalSeats - bookedSeats;
+
+          return {
+            ...event.toJSON(),
+            bookedSeats,
+            availableSeats,
+          };
+        })
+      );
 
       return {
         events,
@@ -97,37 +113,34 @@ class EventController extends RootController {
         throw new Error("Event not found");
       }
 
-      return event.toJSON();
+      // return event.toJSON();
+      return await EventBookingUtils.addSeatsToEvent(event);
     } catch (error) {
       throw error;
     }
   }
 
-  async updateEvent(
-    eventId: string,
-    updateData: any,
-    userId: string,
-    isAdmin: boolean = false
-  ) {
+  async updateEvent(eventId: string, updateData: any, userId: string) {
     try {
       const event = await findEventById(eventId);
+
+      if (event.status === "completed") {
+        throw new Error("Completed events cannot be updated");
+      }
 
       if (updateData.date) {
         this.validateFutureDate(updateData.date, "Event date");
       }
 
-      // if (!isAdmin && event.organizer.toString() !== userId) {
-      //   throw new Error("You are not authorized to update this event");
-      // }
-
       if (updateData.totalSeats) {
-        const currentBookedSeats = event.bookedSeats;
+        const currentBookedSeats = await BookingModel.countDocuments({
+          event: eventId,
+        });
         if (updateData.totalSeats < currentBookedSeats) {
           throw new Error(
             "Total seats cannot be less than currently booked seats"
           );
         }
-        updateData.availableSeats = updateData.totalSeats - currentBookedSeats;
       }
 
       if (updateData.price !== undefined) {
@@ -140,19 +153,15 @@ class EventController extends RootController {
         { new: true, runValidators: true }
       );
 
-      return updatedEvent?.toJSON();
+      return await EventBookingUtils.addSeatsToEvent(updatedEvent);
     } catch (error) {
       throw error;
     }
   }
 
-  async deleteEvent(eventId: string, userId: string, isAdmin: boolean = false) {
+  async deleteEvent(eventId: string, userId: string) {
     try {
       const event = await findEventById(eventId);
-
-      // if (!isAdmin && event.organizer.toString() !== userId) {
-      //   throw new Error("You are not authorized to delete this event");
-      // }
 
       await this.model.findByIdAndDelete(eventId);
       return { message: "Event deleted successfully" };
@@ -161,17 +170,19 @@ class EventController extends RootController {
     }
   }
 
-  async toggleEventStatus(
-    eventId: string,
-    userId: string,
-    isAdmin: boolean = false
-  ) {
+  async toggleEventStatus(eventId: string, userId: string) {
     try {
       const event = await findEventById(eventId);
 
-      // if (!isAdmin && event.organizer.toString() !== userId) {
-      //   throw new Error("You are not authorized to update this event");
-      // }
+      if (event.status === "completed") {
+        throw new Error("Completed events cannot have their status changed");
+      }
+
+      const eventDate = new Date(event.date);
+      const currentDate = new Date();
+      if (eventDate < currentDate) {
+        throw new Error("Past events cannot have their status changed");
+      }
 
       const newStatus = event.status === "active" ? "cancelled" : "active";
       const updatedEvent = await this.model.findByIdAndUpdate(
@@ -180,44 +191,76 @@ class EventController extends RootController {
         { new: true }
       );
 
-      return updatedEvent?.toJSON();
+      return await EventBookingUtils.addSeatsToEvent(updatedEvent);
     } catch (error) {
       throw error;
     }
   }
 
-  async getEventsByCategory() {
+  async getEventStats() {
     try {
-      const categoryStats = await this.model.aggregate([
-        {
-          $match: {
-            status: "active",
-            date: { $gte: new Date() },
-          },
-        },
+      const totalEvents = await this.model.countDocuments();
+
+      const activeEvents = await this.model.countDocuments({
+        status: "active",
+      });
+
+      const cancelledEvents = await this.model.countDocuments({
+        status: "cancelled",
+      });
+
+      const completedEvents = await this.model.countDocuments({
+        status: "completed",
+      });
+
+      const totalBookings = await BookingModel.countDocuments();
+
+      const events = await this.model.find({}, "totalSeats").exec();
+      const totalSeats = events.reduce(
+        (sum, event) => sum + event.totalSeats,
+        0
+      );
+
+      const totalBookedSeats = await BookingModel.countDocuments();
+      const totalAvailableSeats = totalSeats - totalBookedSeats;
+
+      const eventsByCategory = await this.model.aggregate([
         {
           $group: {
             _id: "$category",
             count: { $sum: 1 },
-            totalSeats: { $sum: "$totalSeats" },
-            bookedSeats: { $sum: "$bookedSeats" },
-            averagePrice: { $avg: "$price" },
-            events: {
-              $push: {
-                _id: "$_id",
-                name: "$name",
-                date: "$date",
-                venue: "$venue",
-                price: "$price",
-                availableSeats: "$availableSeats",
-              },
-            },
           },
         },
-        { $sort: { count: -1 } },
+        {
+          $sort: { count: -1 },
+        },
       ]);
 
-      return categoryStats;
+      const eventsByStatus = await this.model.aggregate([
+        {
+          $group: {
+            _id: "$status",
+            count: { $sum: 1 },
+          },
+        },
+      ]);
+
+      const freeEvents = await this.model.countDocuments({ isFree: true });
+      const paidEvents = await this.model.countDocuments({ isFree: false });
+
+      return {
+        totalEvents,
+        activeEvents,
+        cancelledEvents,
+        completedEvents,
+        totalBookings,
+        totalSeats,
+        totalAvailableSeats,
+        freeEvents,
+        paidEvents,
+        eventsByCategory,
+        eventsByStatus,
+      };
     } catch (error) {
       throw error;
     }

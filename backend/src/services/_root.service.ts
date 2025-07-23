@@ -19,7 +19,6 @@ export class RootService {
         const dataErr = data ? JSON.stringify(data) : data;
         const error = `["App Error"}] ${response.message} ${dataErr}`;
         winston.error(error);
-        // airbrake_request_logger({serviceResponse})
       }
     } catch (error: any) {
       res

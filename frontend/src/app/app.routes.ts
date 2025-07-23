@@ -59,8 +59,8 @@ export const routes: Routes = [
       {
         path: 'bookings',
         loadComponent: () =>
-          import('./dashboard/user-dashboard/user-dashboard.component').then(
-            (m) => m.UserDashboardComponent
+          import('./dashboard/user-bookings/user-bookings.component').then(
+            (m) => m.UserBookingsComponent
           ),
       },
       {
