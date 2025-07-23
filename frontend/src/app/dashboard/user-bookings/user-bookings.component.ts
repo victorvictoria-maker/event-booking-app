@@ -101,11 +101,11 @@ export class UserBookingsComponent implements OnInit {
 
   private categorizeBookings() {
     this.upcomingBookings = this.allBookings.filter((booking) => {
-      return booking.event.status === 'active';
+      return booking.event?.status === 'active';
     });
 
     this.completedBookings = this.allBookings.filter((booking) => {
-      return booking.event.status === 'completed';
+      return booking.event?.status === 'completed';
     });
   }
 
@@ -130,15 +130,15 @@ export class UserBookingsComponent implements OnInit {
       const searchTerm = this.upcomingFilters.searchTerm.toLowerCase();
       filteredBookings = filteredBookings.filter(
         (booking) =>
-          booking.event.name.toLowerCase().includes(searchTerm) ||
-          booking.event.venue.toLowerCase().includes(searchTerm) ||
-          booking.event.category.toLowerCase().includes(searchTerm)
+          booking.event?.name.toLowerCase().includes(searchTerm) ||
+          booking.event?.venue.toLowerCase().includes(searchTerm) ||
+          booking.event?.category.toLowerCase().includes(searchTerm)
       );
     }
 
     if (this.upcomingFilters.category) {
       filteredBookings = filteredBookings.filter(
-        (booking) => booking.event.category === this.upcomingFilters.category
+        (booking) => booking.event?.category === this.upcomingFilters.category
       );
     }
 
@@ -152,16 +152,16 @@ export class UserBookingsComponent implements OnInit {
       const searchTerm = this.completedFilters.searchTerm.toLowerCase();
       filteredBookings = filteredBookings.filter(
         (booking) =>
-          booking.event.name.toLowerCase().includes(searchTerm) ||
-          booking.event.venue.toLowerCase().includes(searchTerm) ||
-          booking.event.category.toLowerCase().includes(searchTerm)
+          booking.event?.name.toLowerCase().includes(searchTerm) ||
+          booking.event?.venue.toLowerCase().includes(searchTerm) ||
+          booking.event?.category.toLowerCase().includes(searchTerm)
       );
     }
 
     if (this.completedFilters.category) {
       filteredBookings = filteredBookings.filter(
         (booking) =>
-          booking.event.category.toLowerCase() ===
+          booking.event?.category.toLowerCase() ===
           this.completedFilters.category.toLowerCase()
       );
     }
